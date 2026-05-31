@@ -54,25 +54,29 @@ including the parts I got wrong.
 
 ## 🚀 How to use this
 
-There's no one big installer. You **work through the guide chapter by chapter**, and
-each folder gives you a `README.md` (the walkthrough), a PDF of that chapter, and a
-few small helper scripts for the basic steps. A typical flow on a freshly
-flashed, Tailscale-signed-in Pi (see [Chapter 1](01-foundation/README.md)):
+There's no one big installer. You **work through the guide chapter by chapter**.
+Each folder has a `README.md` (the walkthrough), a PDF of that chapter, a
+`scripts/` folder of small **numbered** helpers (run them in order), and, for the
+service chapters, a `compose/` folder with the actual `compose.yaml` / `Caddyfile`
+so you can either run the script **or copy the file by hand**. A typical flow on a
+freshly flashed, Tailscale-signed-in Pi (see [Chapter 1](01-foundation/README.md)):
 
 ```bash
 git clone https://github.com/evannsmc/BeginnerHomelabGuide.git
 cd BeginnerHomelabGuide
 
-# read 01-foundation/README.md, then run its helpers:
-01-foundation/update-system.sh
-01-foundation/install-docker.sh
-01-foundation/install-tailscale.sh
+# read 01-foundation/README.md, then run its helpers in order:
+01-foundation/scripts/01-update-system.sh
+01-foundation/scripts/02-install-docker.sh
+01-foundation/scripts/03-install-tailscale.sh
 # ...then move on to 02-audiobookshelf, 03-pihole, and so on.
 ```
 
-Read a script before running it. Each one does a single basic task; the
-use-case-specific steps (ripping your own audio, pointing your router's DNS,
-trusting the HTTPS cert) are explained in the chapter's README, not scripted.
+Prefer to do it by hand? Skip the scripts entirely: copy the files from each
+chapter's `compose/` folder and the commands from its README. Either way works.
+Read a script before running it; the use-case-specific steps (ripping your own
+audio, pointing your router's DNS, trusting the HTTPS cert) are explained in the
+chapter's README, not scripted.
 
 ## 📖 The chapters
 
@@ -107,22 +111,28 @@ to verify it).
 ## 📂 What's in each folder
 
 ```
-01-foundation/
-├── README.md            ← the full guide for this chapter (copy-paste friendly)
-├── 01-foundation.pdf    ← the same chapter as a standalone PDF
-├── update-system.sh     ← one small helper per basic step
-├── install-docker.sh
-└── install-tailscale.sh
+04-pretty-urls/
+├── README.md                ← the full guide for this chapter (copy-paste friendly)
+├── 04-pretty-urls.pdf       ← the same chapter as a standalone PDF
+├── scripts/                 ← small numbered helpers, run in order
+│   ├── 01-attach-services-to-network.sh
+│   ├── 02-start-caddy.sh
+│   └── 03-add-local-dns-records.sh
+└── compose/                 ← the real files to grab (the scripts install these)
+    ├── Caddyfile
+    ├── caddy.compose.yaml
+    ├── audiobookshelf.compose.yaml
+    └── pihole.compose.yaml
 ```
 
-Other folders follow the same shape, e.g. `02-audiobookshelf/` has
-`make-dirs.sh` + `start-audiobookshelf.sh`, `03-pihole/` has `free-port-53.sh` +
-`start-pihole.sh`, and so on. (`06-remoting-phone` and `08-away-from-home` have no
-scripts.) The service chapters also ship the **actual config files** that chapter
-has you create, ready to grab: the `compose.yaml` (and in `04-pretty-urls/` the
-`Caddyfile` plus the Chapter-4 networked rewrites, and in `05-dashboard/` the
-Homepage `config/`). Real secrets stay out; an `.env.example` shows the shape
-where a `.env` is needed. In the repo root:
+Every chapter follows this shape: a `scripts/` folder of small numbered helpers
+(`01-…`, `02-…`, in the order the chapter runs them), and, where the chapter has
+you create config, a `compose/` folder with the real `compose.yaml` / `Caddyfile`
+(and the Homepage `config/` for the dashboard), ready to copy by hand. The scripts
+just install those same files and start the containers, so there's one copy of
+each, no drift. Secrets stay out; an `.env.example` shows the shape where a `.env`
+is needed. (`06-remoting-phone` and `08-away-from-home` are reading / app-setup, so
+no scripts.) In the repo root:
 
 - **[`Beginner-Homelab-on-a-Raspberry-Pi.pdf`](Beginner-Homelab-on-a-Raspberry-Pi.pdf)**.
   The entire guide as one book.

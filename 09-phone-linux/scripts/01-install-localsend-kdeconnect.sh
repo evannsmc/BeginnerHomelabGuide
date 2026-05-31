@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Install LocalSend + KDE Connect and open their firewall ports (run on your LINUX laptop). Small self-contained helper; this is the setup I use and test, adapt as needed.
 set -euo pipefail
+set -euo pipefail
 
 command -v flatpak >/dev/null 2>&1 && flatpak install -y flathub org.localsend.localsend_app || true
 if command -v apt >/dev/null 2>&1; then sudo apt install -y kdeconnect

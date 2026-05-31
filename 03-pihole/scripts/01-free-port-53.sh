@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Disable the systemd-resolved stub so Pi-hole can use port 53 (run on the Pi). Small self-contained helper; this is the setup I use and test, adapt as needed.
 set -euo pipefail
+set -euo pipefail
 
 sudo mkdir -p /etc/systemd/resolved.conf.d
 printf '[Resolve]\nDNSStubListener=no\n' | sudo tee /etc/systemd/resolved.conf.d/no-stub.conf >/dev/null

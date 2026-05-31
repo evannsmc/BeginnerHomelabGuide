@@ -8,7 +8,3 @@ abs.home {
 	tls internal
 	reverse_proxy audiobookshelf:80
 }
-home.home, homelab {
-	tls internal
-	reverse_proxy homepage:3000
-}
