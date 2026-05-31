@@ -99,8 +99,11 @@ where a recreate always re-attaches it. Pi-hole gets the same treatment in Step 
 Three changes to Pi-hole's `~/pihole/compose.yaml`, all needed before the proxy
 works:
 
-- **Free host port 80.** Caddy will be the single front door on port 80, so move
-  Pi-hole's web UI to `8081`.
+- **Free host port 80.** Caddy becomes the single front door on port 80, because
+  that's the port a browser hits for a bare URL like `pihole.home`. The backends
+  are reached *through* Caddy by container name (`pihole:80`) on the internal
+  network, so their **host** port no longer matters, which is why we can move
+  Pi-hole's web UI off 80 to `8081`.
 - **Listen on the tailnet, not just the LAN.** In Chapter 3 you bound Pi-hole to
   your LAN IP because it was a home-only service. To make `.home` names (and
   Pi-hole's own ad-blocking) work *everywhere*, Pi-hole's DNS must also answer on
