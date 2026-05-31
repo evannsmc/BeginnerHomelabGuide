@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Heads up: this script automates MY homelab, for MY use case (see the repo
+# README). It's a worked example to read and adapt, not a one-size-fits-all
+# installer. Read it before you run it, and change anything that doesn't fit
+# your hardware, your services, or what you actually need.
+# ---------------------------------------------------------------------------
 # ============================================================================
 # Beginner Homelab on a Raspberry Pi — one-shot installer.
 #
@@ -19,6 +25,9 @@ PARTS=(01-foundation 02-audiobookshelf 03-pihole 04-pretty-urls 05-dashboard)
 
 echo "This will build Parts 1-5 of the homelab on THIS machine."
 echo "Make sure you're on the Raspberry Pi and Tailscale is signed in."
+echo "These scripts automate MY homelab for MY use case (the Assimil-mp3 example);"
+echo "read them first and adapt anything that does not fit your setup."
+echo
 read -rp "Continue? [y/N] " go
 [[ "${go:-N}" =~ ^[Yy] ]] || { echo "Aborted."; exit 0; }
 

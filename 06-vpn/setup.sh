@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Heads up: this script automates MY homelab, for MY use case (see the repo
+# README). It's a worked example to read and adapt, not a one-size-fits-all
+# installer. Read it before you run it, and change anything that doesn't fit
+# your hardware, your services, or what you actually need.
+# ---------------------------------------------------------------------------
 # Part 6 — VPN options. Choosing a VPN is mostly a decision (read the README).
 # The one thing scriptable HERE is Option C: make THIS Pi a Tailscale exit node
 # ("appear at home", and the only exit option that keeps Pi-hole filtering).

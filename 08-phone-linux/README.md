@@ -1,3 +1,8 @@
+> [!NOTE]
+> This is part of my personal homelab guide. The `setup.sh` in this folder
+> automates *my* setup for *my* use case, so not all of it will apply to you.
+> Read it before running and adapt it to your own hardware and needs. See the
+> [main README](../README.md) for the full picture.
 
 
 # Part 8 — Wiring your iPhone into your Linux machines

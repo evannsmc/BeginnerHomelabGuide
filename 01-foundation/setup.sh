@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Heads up: this script automates MY homelab, for MY use case (see the repo
+# README). It's a worked example to read and adapt, not a one-size-fits-all
+# installer. Read it before you run it, and change anything that doesn't fit
+# your hardware, your services, or what you actually need.
+# ---------------------------------------------------------------------------
 # Part 1 — Foundation: Docker + Tailscale on a freshly-flashed Raspberry Pi.
 #
 # Run this ON the Pi, after you've flashed Raspberry Pi OS Lite (64-bit) with

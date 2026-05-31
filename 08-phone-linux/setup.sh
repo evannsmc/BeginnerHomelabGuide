@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Heads up: this script automates MY homelab, for MY use case (see the repo
+# README). It's a worked example to read and adapt, not a one-size-fits-all
+# installer. Read it before you run it, and change anything that doesn't fit
+# your hardware, your services, or what you actually need.
+# ---------------------------------------------------------------------------
 # Part 8 — Phone <-> Linux file/clipboard sharing. Run this on your LINUX LAPTOP
 # (NOT the headless Pi — these are desktop tools). Installs LocalSend + KDE
 # Connect and opens the LAN firewall ports. Pairing happens in the apps.

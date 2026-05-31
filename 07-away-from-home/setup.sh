@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Heads up: this script automates MY homelab, for MY use case (see the repo
+# README). It's a worked example to read and adapt, not a one-size-fits-all
+# installer. Read it before you run it, and change anything that doesn't fit
+# your hardware, your services, or what you actually need.
+# ---------------------------------------------------------------------------
 # Part 7 — On the road. Nothing to install: this part is the mental model for
 # what you can/can't have away from home. This script just prints the rule, the
 # decision matrix, and the client commands. (Full explanation in the README.)

@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Heads up: this script automates MY homelab, for MY use case (see the repo
+# README). It's a worked example to read and adapt, not a one-size-fits-all
+# installer. Read it before you run it, and change anything that doesn't fit
+# your hardware, your services, or what you actually need.
+# ---------------------------------------------------------------------------
 # Part 3 — Pi-hole network-wide ad blocking. Run this ON the Pi.
 #
 # Frees port 53 (disables the systemd-resolved stub), then deploys Pi-hole as a
