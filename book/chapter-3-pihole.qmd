@@ -348,13 +348,24 @@ run **Update Gravity** or nothing changes.
 Run through these in order; each isolates a different layer:
 
 ```bash
-# 1. Pi-hole is up and answering DNS locally on the Pi
-dig +short google.com @127.0.0.1            # returns IPs = resolver works
-dig +short doubleclick.net @127.0.0.1       # returns 0.0.0.0 = blocking works
+# Query Pi-hole at the Pi's LAN IP (e.g. 192.168.1.50), the address it's bound to.
+# 1. On the Pi itself:
+dig +short google.com @192.168.1.50         # returns IPs = resolver works
+dig +short doubleclick.net @192.168.1.50    # returns 0.0.0.0 = blocking works
 
-# 2. Pi-hole answers other devices on the LAN (run from your laptop at home)
+# 2. From another device on the LAN (run this from your laptop at home):
 dig +short doubleclick.net @192.168.1.50    # 0.0.0.0 = LAN clients can use it
 ```
+
+::: {.callout-note}
+## Why not `@127.0.0.1`?
+You might reach for `dig @127.0.0.1` on the Pi, but here it returns "connection
+refused", and that's correct, not a fault. In this chapter Pi-hole is published on
+the **LAN IP only** (`${PIHOLE_IP}:53`), not on localhost, and Step 1 disabled the
+`systemd-resolved` stub that used to answer on `127.0.0.53`. So query the Pi by its
+LAN address instead. (In [Chapter 4](chapter-4-pretty-urls.qmd) you switch Pi-hole
+to listen on all interfaces, and `@127.0.0.1` starts working too.)
+:::
 
 Then the real-world test: on a device connected to your home Wi-Fi, open a
 normally ad-heavy site or app, then watch the **Query Log** at
