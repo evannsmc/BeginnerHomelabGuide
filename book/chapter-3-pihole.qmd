@@ -70,7 +70,23 @@ change in the main `resolved.conf`.
 If step 4 prints a line mentioning `systemd-resolve`, the stub is still bound, 
 re-check that the drop-in saved correctly and that you restarted the service.
 
-### Step 2: Run Pi-hole in Docker
+### Step 2: Give the Pi a fixed LAN IP
+
+Pi-hole's address must never change, because in a moment your whole network
+will point its DNS at it, and a Pi-hole whose IP drifts is a house-wide DNS
+outage. So before configuring anything, pin the Pi to one LAN address.
+
+In your **router's admin page**, find the DHCP settings and add a
+**reservation** (sometimes called a *static lease*): tell the router to always
+hand the Pi the same IP. Match it by the Pi's MAC address, or pick the Pi out
+of the list of connected devices. Note the address it gets (for example
+`192.168.1.50`); if you need the Pi's current IP, run `hostname -I` on the Pi.
+You'll use this address as `PIHOLE_IP` in the next step.
+
+No reservation option on your router? You can set a static IP on the Pi
+itself instead, but a router reservation is simpler and the usual way.
+
+### Step 3: Run Pi-hole in Docker
 
 You already have a Docker workflow from Chapter 1, so we'll keep Pi-hole in the
 same world rather than installing it natively. That means one lifecycle to
@@ -101,8 +117,7 @@ EOF
 chmod 600 .env      # readable only by you
 ```
 
-Set `TZ` to your timezone and `PIHOLE_IP` to your Pi's real LAN address (run
-`hostname -I` to find it). For the password, type a strong one, or generate one
+Set `TZ` to your timezone and `PIHOLE_IP` to the address you reserved in Step 2. For the password, type a strong one, or generate one
 and drop it straight in:
 
 ```bash
@@ -116,7 +131,7 @@ The compose file below publishes Pi-hole's ports on `${PIHOLE_IP}` specifically
 (e.g. `192.168.1.50:53`) rather than on every interface. Serving on the one LAN
 address you actually use is tidier and a little safer, Pi-hole listens where it
 needs to and nowhere else. Make `PIHOLE_IP` the **static or DHCP-reserved**
-address you assign the Pi in Step 4, so it never changes underneath you.
+address you reserved in Step 2, so it never changes underneath you.
 :::
 
 **3. Create `compose.yaml`.**
@@ -224,7 +239,7 @@ command is now `pihole setpassword`. If a tutorial tells you to edit
 `setupVars.conf`, it predates v6, ignore it.
 :::
 
-### Step 3: Set the admin password and log in
+### Step 4: Set the admin password and log in
 
 The web UI lives at `http://<pi-ip>/admin`. On your home network use the Pi's
 LAN IP (e.g. `http://192.168.1.50/admin`); find it with `hostname -I` on the
@@ -250,17 +265,15 @@ change it there, nowhere else.
 
 ## Part B: Point your home network at it
 
-### Step 4: Point your home network at Pi-hole
+### Step 5: Point your home network at Pi-hole
 
 This is the centerpiece. You want every device in the house to use Pi-hole as
 its DNS server without configuring each one. The cleanest way is to set it
 **once at your router**, because the router hands out DNS settings to every
 device via DHCP when they join the Wi-Fi.
 
-1. Find the Pi's LAN IP and lock it down. Run `hostname -I` on the Pi to get
-   the address (e.g. `192.168.1.50`). In your router's admin page, assign that
-   IP as a **DHCP reservation / static lease** for the Pi, so it never changes
-   out from under you. (A Pi-hole whose IP drifts is a house-wide DNS outage.)
+1. Use the Pi's reserved LAN IP from Step 2 (e.g. `192.168.1.50`). That's the
+   address every device will be told to use for DNS.
 2. In the router's settings, find the **DNS server** field, usually under
    *DHCP*, *LAN*, or *Internet* settings, and set the **primary DNS** to the
    Pi's IP (`192.168.1.50`).
@@ -291,7 +304,7 @@ the *whole internet* is a problem. Keep it on your home network.
 
 ## Part C: Add blocklists and verify
 
-### Step 5: Add good blocklists
+### Step 6: Add good blocklists
 
 A fresh Pi-hole v6 already subscribes to **StevenBlack's unified hosts list**,
 which is a strong baseline on its own. You can verify it under **Lists** in the
@@ -330,7 +343,7 @@ fewer "this website is broken" surprises. Every time you add or remove a list,
 run **Update Gravity** or nothing changes.
 :::
 
-### Step 6: Verify the whole thing
+### Step 7: Verify the whole thing
 
 Run through these in order; each isolates a different layer:
 
@@ -362,7 +375,7 @@ The `systemd-resolved` stub is still bound. Re-run Step 1 and verify with
 **Some devices still show ads after the router DNS change.**
 Either they haven't renewed their DHCP lease (toggle Wi-Fi off/on), or your
 router has a *secondary* DNS set that lets them bypass Pi-hole. Clear the
-secondary entry (Step 4.3).
+secondary entry (Step 5.3).
 
 **A device hard-codes its own DNS and ignores the router.**
 Some devices (notably certain Android phones, Chromecasts, and anything using
