@@ -192,10 +192,17 @@ From the Pi (or your laptop):
 ``` bash
 tailscale status        # lists every device with a green marker when online
 ping homelab            # from the laptop/phone, resolves via MagicDNS
+ssh homelab             # from your laptop, log straight in by name
 ```
 
-If `homelab` resolves and `tailscale status` shows your laptop and phone
-online, the foundation is done.
+You should now be able to `ssh homelab` **directly**, no IP and no LAN
+address, from any device on your tailnet, anywhere. (That works as long
+as your laptop username matches the one on the Pi; if it differs, use
+`ssh you@homelab`. The first connection may ask you to confirm the host
+fingerprint, which is normal.)
+
+If `homelab` resolves, `tailscale status` shows your laptop and phone
+online, and `ssh homelab` logs you in, the foundation is done.
 
 > [!TIP]
 >
