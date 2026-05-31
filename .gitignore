@@ -1,0 +1,9 @@
+# Secrets never belong in the repo (scripts create these locally on the Pi)
+.env
+.env.local
+*.key
+*.pem
+# OS / editor cruft
+.DS_Store
+*.swp
+*~
