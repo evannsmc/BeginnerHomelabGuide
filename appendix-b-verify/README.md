@@ -33,10 +33,11 @@ on, the `.home` names and tailnet-wide ad-blocking won’t work on your
 >     exit node* **off**. Save.
 > 2.  Turn **on “Override local DNS.”**
 >
-> This is the [Part 4](../04-pretty-urls/README.md) Step 5 step. Verify it
-> took with `tailscale dns status` on any device, under *Resolvers* you
-> should see your Pi’s `100.x.y.z`, not “no resolvers configured.” If it
-> still says no resolvers, the admin-console setting hasn’t applied yet.
+> This is the [Chapter 4](../04-pretty-urls/README.md) Step 5 step. Verify
+> it took with `tailscale dns status` on any device, under *Resolvers*
+> you should see your Pi’s `100.x.y.z`, not “no resolvers configured.”
+> If it still says no resolvers, the admin-console setting hasn’t
+> applied yet.
 
 ## The service map
 
@@ -73,7 +74,7 @@ docker network inspect homelab --format "{{range .Containers}}{{.Name}} {{end}}"
 
 All five names should appear. If `pihole` or `audiobookshelf` is
 missing, the reverse proxy can’t reach it, re-read the network callout
-in [Part 4](../04-pretty-urls/README.md).
+in [Chapter 4](../04-pretty-urls/README.md).
 
 **3. DNS resolves the pretty names (on the Pi):**
 
@@ -114,14 +115,14 @@ Open `https://home.home`. The Pi-hole tile should show today’s
 blocked-query count and the Audiobookshelf tile your library, proof the
 widgets authenticated through the `homelab` network using the secrets in
 `~/dashboard/.env`. If a tile says “API error,” see the widget
-troubleshooting in [Part 5](../05-dashboard/README.md) (for Pi-hole, the
-usual culprit is a missing `version: 6`).
+troubleshooting in [Chapter 5](../05-dashboard/README.md) (for Pi-hole,
+the usual culprit is a missing `version: 6`).
 
 ## What works away from home (and what deliberately doesn’t)
 
 Once the cloud setting above is on, here’s the honest picture the moment
-you leave the house, the full reasoning is in [Part
-7](../07-away-from-home/README.md):
+you leave the house, the full reasoning is in [Chapter
+8](../08-away-from-home/README.md):
 
 | Mode (away) | Homelab URLs? | Pi-hole ad-block? | Hides your IP? |
 |----|----|----|----|
@@ -140,7 +141,7 @@ modes. The everyday default (top row) is the one you live in.
 Nothing extra is required after a power cycle. Every container uses a
 `restart:` policy (`unless-stopped` or `always`), so Docker brings them
 all back on boot; the `homelab` network is persistent; and the
-`systemd-resolved` stub stays disabled (the drop-in from [Part
+`systemd-resolved` stub stays disabled (the drop-in from [Chapter
 3](../03-pihole/README.md) survives reboots), so Pi-hole reclaims port 53
 cleanly. Reboot the Pi and re-run the verification steps above, every
 row should pass without you touching anything.

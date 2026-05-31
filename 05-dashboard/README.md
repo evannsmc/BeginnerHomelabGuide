@@ -5,17 +5,17 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 5. A one-URL dashboard at `https://home.home`
+# Chapter 5. A one-URL dashboard at `https://home.home`
 
-> **The payoff of this part:** open any browser on your tailnet, type
+> **The payoff of this chapter:** open any browser on your tailnet, type
 > **`https://home.home`**, and land on a clean dashboard that shows your
 > services at a glance and links into a full Docker management console,
 > the single front door that ties everything together.
 
-Part 4 gave individual services clean names (`https://pihole.home`,
+Chapter 4 gave individual services clean names (`https://pihole.home`,
 `https://abs.home`). This part adds the *landing page* that gathers them
 in one place, plus a real management GUI, and it slots into the reverse
-proxy you built in Part 4 using the exact three-step pattern from the
+proxy you built in Chapter 4 using the exact three-step pattern from the
 end of that chapter.
 
 We’ll install two complementary tools:
@@ -41,7 +41,9 @@ links to Portainer with a single tile.
 > Homepage wins for a written guide because its config is plain text you
 > can copy-paste, back up, and reproduce exactly.
 
-## Step 1: Deploy Homepage and Portainer
+## Part A: Deploy Homepage and Portainer
+
+### Step 1: Deploy Homepage and Portainer
 
 Make the project folder (one stack for the whole control panel):
 
@@ -50,8 +52,8 @@ mkdir -p ~/dashboard && cd ~/dashboard
 ```
 
 Create `~/dashboard/compose.yaml`. Note Homepage has **no host port**,
-Caddy (from Part 4) is the front door on port 80 and will reach Homepage
-by container name over the shared `homelab` network:
+Caddy (from Chapter 4) is the front door on port 80 and will reach
+Homepage by container name over the shared `homelab` network:
 
 ``` yaml
 services:
@@ -85,7 +87,7 @@ services:
 
 networks:
   homelab:
-    external: true           # the shared network created in Part 4
+    external: true           # the shared network created in Chapter 4
 
 volumes:
   portainer_data:
@@ -132,7 +134,7 @@ cd ~/dashboard && docker compose up -d
 > locks itself and you must `docker restart portainer` to reopen the
 > window. The `:lts` image runs natively on a 64-bit Pi.
 
-## Step 2: Configure the tiles
+### Step 2: Configure the tiles
 
 > [!IMPORTANT]
 >
@@ -178,13 +180,13 @@ my-docker:
 ```
 
 **`config/services.yaml`**, the tiles, now pointing at the pretty URLs
-from Part 4:
+from Chapter 4:
 
 ``` yaml
 - Media:
     - Audiobookshelf:
         icon: audiobookshelf.png
-        href: https://abs.home                  # the pretty URL from Part 4
+        href: https://abs.home                  # the pretty URL from Chapter 4
         description: Audiobooks & language courses
         server: my-docker
         container: audiobookshelf              # -> live status dot + CPU/RAM
@@ -196,7 +198,7 @@ from Part 4:
 - Network:
     - Pi-hole:
         icon: pi-hole.png
-        href: https://pihole.home               # the pretty URL from Part 4
+        href: https://pihole.home               # the pretty URL from Chapter 4
         description: DNS ad-blocking
         server: my-docker
         container: pihole
@@ -265,12 +267,14 @@ cd ~/dashboard && docker compose restart homepage
 > which no longer exists. The `key` for v6 is your admin password, not a
 > legacy API token.
 
-## Step 3: Give the dashboard its pretty URL
+## Part B: Give it a pretty URL and use it
 
-This is the Part 4 pattern, applied to the dashboard. Add a Caddy route
-and a Pi-hole record so `https://home.home` (and the alias
+### Step 3: Give the dashboard its pretty URL
+
+This is the Chapter 4 pattern, applied to the dashboard. Add a Caddy
+route and a Pi-hole record so `https://home.home` (and the alias
 `https://homelab`) open the dashboard. `tls internal` gives it the same
-trusted-cert treatment as Part 4’s names, no extra certificate work.
+trusted-cert treatment as Chapter 4’s names, no extra certificate work.
 
 **1. Add a block to `~/proxy/Caddyfile`:**
 
@@ -287,7 +291,7 @@ cd ~/proxy && docker compose restart caddy
 
 **3. Add a Pi-hole Local DNS record** (Settings → Local DNS Records):
 `home.home` → your Pi’s Tailscale IP (`100.x.y.z`), exactly like the
-records you added in Part 4.
+records you added in Chapter 4.
 
 > [!WARNING]
 >
@@ -300,7 +304,7 @@ records you added in Part 4.
 > `docker compose up -d --force-recreate homepage`. This variable only
 > takes effect on a recreate, not a plain restart.
 
-## Step 4: Try it
+### Step 4: Try it
 
 From your laptop or phone, anywhere on the tailnet:
 
@@ -337,12 +341,13 @@ promptly.
 
 - **Homepage** (no host port) + **Portainer** (on 9443), both on the
   `homelab` network, deployed as one `~/dashboard` stack.
-- **Tiles** point at the pretty URLs from Part 4 and pull live status
+- **Tiles** point at the pretty URLs from Chapter 4 and pull live status
   via the Docker socket and service APIs.
 - **Added the dashboard to the proxy**, one Caddy block + one Pi-hole
   record, so `https://home.home` (and `https://homelab`) open it from
   anywhere.
 
-Your homelab now has a single, memorable front door. In [Part
-6](../06-vpn/README.md) we turn to privacy on the *outbound* side: what a VPN
-does, how Aura and Mullvad compare, and what a Tailscale *exit node* is.
+Your homelab now has a single, memorable front door. In [Chapter
+7](../07-vpn/README.md) we turn to privacy on the *outbound* side: what a
+VPN does, how Aura and Mullvad compare, and what a Tailscale *exit node*
+is.

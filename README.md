@@ -5,12 +5,12 @@ A friendly, **beginner-first** guide to building a small home server (a
 
 - 📚 streams your **audiobooks / language courses** (Audiobookshelf),
 - 🛡️ **blocks ads** on every device in your house (Pi-hole),
-- 🔗 gives every service a clean URL like `http://pihole.home` (Caddy),
-- 🎛️ shows it all on one **dashboard** at `http://home.home` (Homepage + Portainer),
+- 🔗 gives every service a clean URL like `https://pihole.home` (Caddy),
+- 🎛️ shows it all on one **dashboard** at `https://home.home` (Homepage + Portainer),
 - 🌍 is reachable **from anywhere** over a private [Tailscale](https://tailscale.com)
   network, with **nothing exposed to the public internet**.
 
-Every part is explained with the *why*, not just the *how*, and every command is
+Every chapter is explained with the *why*, not just the *how*, and every command is
 in a copy-friendly code block.
 
 ## Why I'm building this
@@ -54,10 +54,10 @@ including the parts I got wrong.
 
 ## 🚀 How to use this
 
-There's no one big installer. You **work through the guide part by part**, and
-each folder gives you a `README.md` (the walkthrough), a PDF of that part, and a
+There's no one big installer. You **work through the guide chapter by chapter**, and
+each folder gives you a `README.md` (the walkthrough), a PDF of that chapter, and a
 few small helper scripts for the basic steps. A typical flow on a freshly
-flashed, Tailscale-signed-in Pi (see [Part 1](01-foundation/README.md)):
+flashed, Tailscale-signed-in Pi (see [Chapter 1](01-foundation/README.md)):
 
 ```bash
 git clone https://github.com/evannsmc/BeginnerHomelabGuide.git
@@ -72,20 +72,31 @@ cd BeginnerHomelabGuide
 
 Read a script before running it. Each one does a single basic task; the
 use-case-specific steps (ripping your own audio, pointing your router's DNS,
-trusting the HTTPS cert) are explained in the part's README, not scripted.
+trusting the HTTPS cert) are explained in the chapter's README, not scripted.
 
-## 📖 The parts
+## 📖 The chapters
 
-| # | Folder | What you build |
+The guide is two **volumes** of short chapters. Each chapter is grouped into
+**Parts**, and each Part into **Steps**.
+
+**Volume I, building the homelab**
+
+| Ch | Folder | What you build |
 |---|---|---|
 | 1 | [01-foundation](01-foundation/README.md) | Flash the Pi, install Docker, join a Tailscale network |
-| 2 | [02-audiobookshelf](02-audiobookshelf/README.md) | An audiobook / language-course server |
+| 2 | [02-audiobookshelf](02-audiobookshelf/README.md) | An audiobook / spoken-audio server |
 | 3 | [03-pihole](03-pihole/README.md) | Network-wide ad blocking with Pi-hole |
-| 4 | [04-pretty-urls](04-pretty-urls/README.md) | A Caddy reverse proxy + local DNS for `*.home` URLs |
+| 4 | [04-pretty-urls](04-pretty-urls/README.md) | A Caddy reverse proxy + local DNS for `*.home` URLs (HTTPS) |
 | 5 | [05-dashboard](05-dashboard/README.md) | A one-URL dashboard (Homepage) + Docker GUI (Portainer) |
-| 6 | [06-vpn](06-vpn/README.md) | VPN privacy: Aura vs Mullvad vs Tailscale exit nodes |
-| 7 | [07-away-from-home](07-away-from-home/README.md) | What works on the road, and the one-VPN rule |
-| 8 | [08-phone-linux](08-phone-linux/README.md) | File + clipboard sharing between your phone and Linux |
+| 6 | [06-remoting-phone](06-remoting-phone/README.md) | Reach your machines from your phone: Termius (SSH) + NoMachine (desktop) |
+
+**Volume II, on the road and your devices**
+
+| Ch | Folder | What you build |
+|---|---|---|
+| 7 | [07-vpn](07-vpn/README.md) | VPN privacy: Aura vs Mullvad vs Tailscale exit nodes |
+| 8 | [08-away-from-home](08-away-from-home/README.md) | What works on the road, and the one-VPN rule |
+| 9 | [09-phone-linux](09-phone-linux/README.md) | File + clipboard sharing between your phone and Linux |
 
 **Bonus reference:**
 [appendix-a-compose](appendix-a-compose/README.md) (every Docker Compose file
@@ -97,8 +108,8 @@ to verify it).
 
 ```
 01-foundation/
-├── README.md            ← the full guide for this part (copy-paste friendly)
-├── 01-foundation.pdf    ← the same part as a standalone PDF
+├── README.md            ← the full guide for this chapter (copy-paste friendly)
+├── 01-foundation.pdf    ← the same chapter as a standalone PDF
 ├── update-system.sh     ← one small helper per basic step
 ├── install-docker.sh
 └── install-tailscale.sh
@@ -106,7 +117,7 @@ to verify it).
 
 Other folders follow the same shape, e.g. `02-audiobookshelf/` has
 `make-dirs.sh` + `start-audiobookshelf.sh`, `03-pihole/` has `free-port-53.sh` +
-`start-pihole.sh`, and so on. (`07-away-from-home` is all concept, so it has no
+`start-pihole.sh`, and so on. (`06-remoting-phone` and `08-away-from-home` have no
 scripts.) In the repo root:
 
 - **[`Beginner-Homelab-on-a-Raspberry-Pi.pdf`](Beginner-Homelab-on-a-Raspberry-Pi.pdf)**.
@@ -116,7 +127,7 @@ scripts.) In the repo root:
 
 The helper scripts cover only the **basic, generic** steps (update, install
 Docker/Tailscale, make folders, start containers). Everything use-case-specific
-or interactive you do yourself, guided by each part's README:
+or interactive you do yourself, guided by each chapter's README:
 
 - **Flashing the SD card** (done on your laptop with Raspberry Pi Imager).
 - **Signing into Tailscale** (opens a browser sign-in) and **renaming the Pi**
@@ -124,8 +135,8 @@ or interactive you do yourself, guided by each part's README:
 - **The Tailscale DNS push** (admin console → add the Pi as a nameserver + turn
   on *Override local DNS*). This is what makes `*.home` and ad-blocking work on
   all your devices.
-- **Pointing your router's DNS** at the Pi (Part 3) for non-Tailscale devices.
-- **Trusting Caddy's HTTPS cert** on your devices (Part 4).
+- **Pointing your router's DNS** at the Pi (Chapter 3) for non-Tailscale devices.
+- **Trusting Caddy's HTTPS cert** on your devices (Chapter 4).
 - Ripping and copying your own audio, buying a VPN, installing phone apps.
 
 ## 🛟 Safety & privacy

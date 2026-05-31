@@ -5,10 +5,10 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 8. Wiring your iPhone into your Linux machines
+# Chapter 9. Wiring your iPhone into your Linux machines
 
-> **The payoff of this part:** move files between your iPhone and your
-> Linux laptop in one tap, share a clipboard and see your phone’s
+> **The payoff of this chapter:** move files between your iPhone and
+> your Linux laptop in one tap, share a clipboard and see your phone’s
 > battery on the desktop, do the same to your Pi from anywhere over
 > Tailscale, and know the one wired fallback (USB) for when Wi-Fi isn’t
 > an option, without installing a pile of tools you’ll never use.
@@ -179,10 +179,10 @@ discovery entirely:
 ## Phone ↔ the headless Pi
 
 A caveat worth stating plainly: LocalSend and KDE Connect are
-**desktop** tools. Your Pi from Parts 1–5 runs a **headless** server OS
-(Ubuntu Server 26.04 LTS), no graphical desktop, so neither app is the
-natural fit there. For moving a file between your phone and the Pi, you
-already have better, GUI-free paths:
+**desktop** tools. Your Pi from Chapters 1–5 runs a **headless** server
+OS (Ubuntu Server 26.04 LTS), no graphical desktop, so neither app is
+the natural fit there. For moving a file between your phone and the Pi,
+you already have better, GUI-free paths:
 
 - **Drop it into a service you already run.** Files you want *on* the Pi
   (more audiobooks, say) can go straight into

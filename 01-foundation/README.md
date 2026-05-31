@@ -5,10 +5,10 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 1. Foundation: your Raspberry Pi and your Tailscale network
+# Chapter 1. Foundation: your Raspberry Pi and your Tailscale network
 
-> **The payoff of this part:** an always-on Raspberry Pi that’s ready to
-> host everything in this series, running Docker, hardened SSH, and
+> **The payoff of this chapter:** an always-on Raspberry Pi that’s ready
+> to host everything in this series, running Docker, hardened SSH, and
 > joined to a private Tailscale network, plus your laptop and iPhone on
 > that same network, so every machine can reach every other by name,
 > from anywhere, with nothing exposed to the public internet.
@@ -16,7 +16,7 @@
 This is the groundwork the rest of the book stands on. We don’t install
 any “app” here, instead we build the platform: a Pi that’s online,
 secured, and addressable, and a **tailnet** (your private Tailscale
-network) that stitches your devices together. Every later part
+network) that stitches your devices together. Every later chapter
 (Audiobookshelf, Pi-hole, the dashboard, the VPN) simply plugs into what
 you set up now.
 
@@ -59,7 +59,9 @@ corporate Wi-Fi.
   email at <https://tailscale.com>. One account, signed into on every
   device, is the only “server” you need.
 
-## Step 1: Flash a headless 64-bit Linux with key-based SSH
+## Part A: Flash and first boot
+
+### Step 1: Flash a headless 64-bit Linux with key-based SSH
 
 Install **Raspberry Pi Imager** on your laptop. I’m running **Ubuntu
 Server 26.04 LTS (64-bit)**, so in Imager I choose **Other
@@ -103,11 +105,11 @@ the single most important hardening step for a box that’s always on.
 
 Write the card, put it in the Pi, and power on.
 
-## Step 2: First boot, then install Docker
+### Step 2: First boot, then install Docker
 
 Find the Pi on your LAN and SSH in (`ssh you@<pi-lan-ip>`, or
 `ssh you@homelab.local` if your network supports mDNS). Update it and
-install Docker, which every later part uses to run its services:
+install Docker, which every later chapter uses to run its services:
 
 ``` bash
 # Update the base image
@@ -127,10 +129,12 @@ newgrp docker        # apply the group change in this shell
 > the reverse proxy) ships as a Docker container. Running them in
 > containers keeps their dependencies off your host, makes upgrades a
 > single `docker pull`, and lets each one live in its own tidy folder
-> with a `compose.yaml`. Installing it once here means every later part
-> just runs `docker compose up`.
+> with a `compose.yaml`. Installing it once here means every later
+> chapter just runs `docker compose up`.
 
-## Step 3: Put the Pi on your tailnet
+## Part B: Join the tailnet
+
+### Step 3: Put the Pi on your tailnet
 
 ``` bash
 curl -fsSL https://tailscale.com/install.sh | sh
@@ -147,7 +151,7 @@ tailscale ip -4      # something like 100.x.y.z
 That `100.x.y.z` is how every other device will reach the Pi. You won’t
 have to memorize it, though, MagicDNS (next step) gives it a name.
 
-## Step 4: Name the Pi `homelab` and turn on MagicDNS
+### Step 4: Name the Pi `homelab` and turn on MagicDNS
 
 **MagicDNS** gives every device on your tailnet a stable name, so you
 can type `homelab` instead of an IP. In the Tailscale admin console
@@ -167,7 +171,9 @@ MagicDNS installs your tailnet name as a **search domain**, the short
 name `homelab` usually works on its own; the full
 `homelab.your-tailnet.ts.net` is the always-reliable fallback.
 
-## Step 5: Install Tailscale on your laptop
+## Part C: Add your devices and verify
+
+### Step 5: Install Tailscale on your laptop
 
 ``` bash
 curl -fsSL https://tailscale.com/install.sh | sh
@@ -178,14 +184,14 @@ Your tailnet is one shared namespace, signing in with the same account
 simply adds the laptop as another peer. From now on you can
 `ssh you@homelab` from the laptop over the tailnet, anywhere.
 
-## Step 6: Install Tailscale on your iPhone
+### Step 6: Install Tailscale on your iPhone
 
 Install **Tailscale** from the App Store and sign in with the same
 account. You should see `homelab` (and your laptop) listed as peers.
 That’s it, the phone is now on the mesh and can reach the Pi by name, on
 Wi-Fi or cellular.
 
-## Step 7: Verify the mesh
+### Step 7: Verify the mesh
 
 From the Pi (or your laptop):
 
@@ -224,6 +230,6 @@ online, and `ssh homelab` logs you in, the foundation is done.
 - **Named the Pi `homelab`** via MagicDNS, so everything is reachable by
   name.
 
-The platform is ready. In [Part 2](../02-audiobookshelf/README.md) we put it
-to work: ripping your Assimil discs and serving them from the Pi to your
-iPhone over the tailnet you just built.
+The platform is ready. In [Chapter 2](../02-audiobookshelf/README.md) we
+put it to work: ripping your Assimil discs and serving them from the Pi
+to your iPhone over the tailnet you just built.

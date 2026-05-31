@@ -1,15 +1,16 @@
 > [!NOTE]
-> Part of my personal homelab guide, written around my own use case. This part is
-> concept (no scripts). See the [main README](../README.md) for the full picture.
+> Part of my personal homelab guide, written around my own use case. This chapter
+> is mostly reading/app setup (no scripts here). See the [main README](../README.md)
+> for the full picture.
 
 
-# Part 7. On the road: your homelab, Pi-hole, and VPN away from home
+# Chapter 8. On the road: your homelab, Pi-hole, and VPN away from home
 
-> **The payoff of this part:** a clear, honest map of what you can and
-> can’t have when you leave the house, reaching your homelab remotely,
-> carrying Pi-hole’s ad-blocking with you, and running a VPN, plus the
-> one rule that explains why you can’t always have all three at once on
-> the same device.
+> **The payoff of this chapter:** a clear, honest map of what you can
+> and can’t have when you leave the house, reaching your homelab
+> remotely, carrying Pi-hole’s ad-blocking with you, and running a VPN,
+> plus the one rule that explains why you can’t always have all three at
+> once on the same device.
 
 At home, everything is easy: your devices share the Pi’s network and
 everything just works. The moment you walk out the door, the only thing
@@ -32,14 +33,14 @@ network over an authenticated tunnel. The hard parts below are all about
 the *outbound* direction, what your traffic does and which DNS resolves
 it.
 
-## Pi-hole already follows you (set up in Part 4)
+## Pi-hole already follows you (set up in Chapter 4)
 
 You don’t need to do anything here, when you made Pi-hole your tailnet’s
-DNS in [Part 4](../04-pretty-urls/README.md) (the **Override local DNS**
-setup), you also got Pi-hole’s ad-blocking on every device, everywhere.
-On cellular, your phone still resolves through Pi-hole, so ads stay
-blocked. The same step is also what makes your `.home` names work away
-from home.
+DNS in [Chapter 4](../04-pretty-urls/README.md) (the **Override local
+DNS** setup), you also got Pi-hole’s ad-blocking on every device,
+everywhere. On cellular, your phone still resolves through Pi-hole, so
+ads stay blocked. The same step is also what makes your `.home` names
+work away from home.
 
 That’s the good news. The catch is what happens when you turn on
 *another* VPN, which is the rest of this chapter.
@@ -94,8 +95,8 @@ modes in seconds. Pick per situation:
 | You’re away and you want… | Set this | Pi-hole? | Homelab? | Hides IP? |
 |----|----|----|----|----|
 | **Homelab + ad-blocking** (the everyday default) | Tailscale on, no exit node | ✅ via DNS push | ✅ | ❌ (your real IP) |
-| **Appear at home / reach LAN** | Tailscale + **Pi as exit node** (Part 6 C) | ✅ | ✅ | ❌ (home IP) |
-| **Privacy / change location** | **Mullvad exit node** (Part 6 A) | ❌ Mullvad’s DNS | ✅ (LAN access on) | ✅ |
+| **Appear at home / reach LAN** | Tailscale + **Pi as exit node** (Chapter 7 C) | ✅ | ✅ | ❌ (home IP) |
+| **Privacy / change location** | **Mullvad exit node** (Chapter 7 A) | ❌ Mullvad’s DNS | ✅ (LAN access on) | ✅ |
 | **Privacy via your existing app** | **Aura** on | ❌ Aura’s DNS | ❌ (Tailscale off) | ✅ |
 
 The pattern to read out of that table:
@@ -116,8 +117,8 @@ The pattern to read out of that table:
 
 ## Making a Mullvad exit node behave on the road
 
-If you go with the Mullvad add-on (Part 6’s recommendation), two flags
-matter when you’re mobile:
+If you go with the Mullvad add-on (Chapter 7’s recommendation), two
+flags matter when you’re mobile:
 
 ``` bash
 # Keep access to LAN devices (printers, etc.) while using an exit node
@@ -188,4 +189,4 @@ internet.
 
 One direction is still missing: getting your *phone and your Linux
 machines* to talk to each other for everyday file transfer and clipboard
-sharing. That’s [Part 8](../08-phone-linux/README.md), the finale.
+sharing. That’s [Chapter 9](../09-phone-linux/README.md), the finale.

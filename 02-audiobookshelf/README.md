@@ -5,14 +5,14 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 2. Streaming audiobooks to your iPhone with Audiobookshelf
+# Chapter 2. Streaming audiobooks to your iPhone with Audiobookshelf
 
-> **The payoff of this part:** a collection of spoken audio (audiobooks,
-> podcasts, language courses, anything) copied once and served from the
-> Raspberry Pi you set up in Part 1, streaming to your iPhone from
-> anywhere over your tailnet, with proper audiobook-style resume
-> tracking (pause mid-sentence today, resume at the same second
-> tomorrow).
+> **The payoff of this chapter:** a collection of spoken audio
+> (audiobooks, podcasts, language courses, anything) copied once and
+> served from the Raspberry Pi you set up in Chapter 1, streaming to
+> your iPhone from anywhere over your tailnet, with proper
+> audiobook-style resume tracking (pause mid-sentence today, resume at
+> the same second tomorrow).
 
 > [!NOTE]
 >
@@ -25,8 +25,8 @@
 > none of the discs. Wherever you see the course, picture your own
 > audiobooks; the steps are the same.
 
-In [Part 1](../01-foundation/README.md) you built the platform: a
-Pi named `homelab` running Docker and on your tailnet, reachable by name
+In [Chapter 1](../01-foundation/README.md) you built the platform: a Pi
+named `homelab` running Docker and on your tailnet, reachable by name
 from your laptop and iPhone. Now we put it to work with
 **Audiobookshelf**, a self-hosted media server purpose-built for spoken
 audio. It runs in a Docker container, scans a folder of MP3s, and serves
@@ -53,9 +53,9 @@ is already files on disk, skip the ripping and just copy it into
 
 ## Prerequisites
 
-- You finished [Part 1](../01-foundation/README.md): the Pi
-  (`homelab`) is on your tailnet with Docker installed, and your laptop
-  and iPhone are on the tailnet too.
+- You finished [Chapter 1](../01-foundation/README.md): the Pi (`homelab`)
+  is on your tailnet with Docker installed, and your laptop and iPhone
+  are on the tailnet too.
 
 - A **CD/DVD drive with the disc inserted**, on whichever machine is
   handy: a built-in drive, or a USB external plugged into the laptop or
@@ -78,7 +78,9 @@ is already files on disk, skip the ripping and just copy it into
   udisksctl mount -b /dev/sr0
   ```
 
-## Step 1: Inspect what’s actually on the disc
+## Part A: Rip and copy the audio
+
+### Step 1: Inspect what’s actually on the disc
 
 Don’t assume the layout. List the mount point (substitute the real label
 that `udisksctl` just printed):
@@ -89,27 +91,27 @@ ls /media/$USER/<disc-label>/
 
 A language-course data CD like mine typically has three useful things:
 
-1.  **A folder of monolithic lessons** with 100 files named
-    `L001-LESSON.mp3` … `L100-LESSON.mp3`: one complete lesson per file,
-    pre-assembled in playback order.
+1.  **A folder of full lessons** with 100 files named `L001-LESSON.mp3`
+    … `L100-LESSON.mp3`: one complete lesson per file, pre-assembled in
+    playback order.
 2.  **Per-lesson folders** (`L001-…` … `L100-…`) that split each lesson
-    into tiny per-sentence files. You can ignore these; the monolithic
-    lessons above are all you need.
+    into tiny per-sentence files. You can ignore these; the full lessons
+    above are all you need.
 3.  **A User’s Manual** in HTML and PDF.
 
 Plus an `autorun.inf` (a Windows launcher you can ignore on Linux). It’s
 a **data CD**, so this is the fast path: a plain file copy, no audio-CD
 ripping or re-encoding.
 
-## Step 2: Use the monolithic (one-file-per-lesson) folder
+### Step 2: Use the one-file-per-lesson folder
 
-Copy the **monolithic** folder, one complete lesson per file. That way
+Copy the folder with **one complete lesson per file**. That way
 Audiobookshelf treats the course as a single audiobook with 100
 sequential chapters: tap “next chapter” to advance one lesson, and your
 resume position lives at the lesson level, which is the right unit of
 progress for a language course.
 
-## Step 3: Get the audio onto the Pi
+### Step 3: Get the audio onto the Pi
 
 Because it’s a data CD, “ripping” is just copying files off the mounted
 disc. The audiobook library lives at
@@ -117,14 +119,14 @@ disc. The audiobook library lives at
 tidy inside the Audiobookshelf folder, set up in Step 4). Do the copy on
 whichever machine has the drive.
 
-### 3a. Copy the main (monolithic) lessons
+#### 3a. Copy the lessons
 
 If the drive is on the Pi, copy straight into the library:
 
 ``` bash
 mkdir -p ~/audiobookshelf/media/Audiobooks/"My Course"
 rsync -av --no-perms --progress \
-  "/media/$USER/<disc-label>/<monolithic-folder>/" \
+  "/media/$USER/<disc-label>/<lessons-folder>/" \
   ~/audiobookshelf/media/Audiobooks/"My Course"/
 ```
 
@@ -137,14 +139,14 @@ defaults instead, so the result behaves like normal files you created.
 The `L001 … L100` names are already zero-padded, so Audiobookshelf
 orders them correctly.
 
-### 3b. If the drive is on your laptop
+#### 3b. If the drive is on your laptop
 
 Rip into any folder on the laptop, then push it to the library path on
 the Pi over the tailnet (works from anywhere, fastest on the same LAN):
 
 ``` bash
 rsync -av --no-perms --progress \
-  "/media/$USER/<disc-label>/<monolithic-folder>/" ~/"My Course"/
+  "/media/$USER/<disc-label>/<lessons-folder>/" ~/"My Course"/
 rsync -avz --partial --no-perms --progress \
   ~/"My Course"/ you@homelab:~/audiobookshelf/media/Audiobooks/"My Course"/
 ```
@@ -152,14 +154,14 @@ rsync -avz --partial --no-perms --progress \
 `-z` compresses over the wire and `--partial` keeps partial files so an
 interrupted transfer resumes quickly, useful for a GB-scale copy.
 
-### 3c. Optional: save the manual
+#### 3c. Optional: save the manual
 
 To keep the disc’s User’s Manual alongside the lessons, copy its folder
 into `~/audiobookshelf/media/Audiobooks/"My Course/_manual"/` the same
 way. The leading underscore sorts it to the bottom so Audiobookshelf
 scans the lessons first.
 
-### 3d. Unmount and eject
+#### 3d. Unmount and eject
 
 When the copy is done, unmount and eject on the machine that had the
 drive:
@@ -171,11 +173,13 @@ eject /dev/sr0
 
 You only do this once; from now on the files live on the Pi’s disk.
 
-## Step 4: Run Audiobookshelf on the Pi
+## Part B: Run the server
+
+### Step 4: Run Audiobookshelf on the Pi
 
 SSH into the Pi if you aren’t already there (`ssh you@homelab`); Docker
-is installed from Part 1. We’ll run Audiobookshelf as a small **Docker
-Compose** project, one folder with one `compose.yaml`, the same
+is installed from Chapter 1. We’ll run Audiobookshelf as a small
+**Docker Compose** project, one folder with one `compose.yaml`, the same
 self-contained pattern every other service in this series uses (so it’s
 one lifecycle to learn and a single file to back up).
 
@@ -227,7 +231,8 @@ What the key settings do:
 - `restart: unless-stopped` auto-starts the container on boot and after
   crashes, exactly what you want on an always-on Pi.
 - `ports: 13378:80` maps host port 13378 to the container’s port 80 (we
-  avoid host port 80 to leave it free for the reverse proxy in Part 4).
+  avoid host port 80 to leave it free for the reverse proxy in Chapter
+  4).
 - The `volumes` expose your audio under `media/` to the container and
   persist the database (listening positions, users, settings) next to
   the compose file, so recreating the container loses nothing. The paths
@@ -240,19 +245,21 @@ docker compose ps
 curl -I http://localhost:13378        # expect HTTP/1.1 200 OK
 ```
 
-## Step 5: Initial setup in the browser
+## Part C: Connect and use it
+
+### Step 5: Initial setup in the browser
 
 From any browser on your tailnet, open **`http://homelab:13378`**. The
 first-run wizard creates the root user, then drops you at an empty
 dashboard.
 
-### 5a. Create the root user
+#### 5a. Create the root user
 
 This is your admin account. Pick a strong password, Audiobookshelf has
 no password-reset flow; if you forget it, recovery means editing the
 SQLite database in `/config` by hand.
 
-### 5b. Add the primary library
+#### 5b. Add the primary library
 
 Settings (gear) → Libraries → Add Library:
 
@@ -276,17 +283,17 @@ Settings (gear) → Libraries → Add Library:
 Save. Audiobookshelf scans and creates one audiobook with 100 chapters
 (`L001-LESSON.mp3` … `L100-LESSON.mp3`) in about 30 seconds.
 
-### 5c. Verify the scan
+#### 5c. Verify the scan
 
 Open the library, open *My Course*: you should see 100 numbered
 chapters. Click chapter 1. It should play in the browser. If it does,
 the server is fully functional.
 
-## Step 6: Connect the iPhone
+### Step 6: Connect the iPhone
 
 1.  Install **Audiobookshelf** from the App Store (by `advplyr`, same as
-    the server). Tailscale is already installed and signed in from Part
-    1.
+    the server). Tailscale is already installed and signed in from
+    Chapter 1.
 2.  Open it, tap **Add Server**:
     - **Server address:** `http://homelab:13378` (or
       `http://100.x.y.z:13378` using the Pi’s Tailscale IP).
@@ -294,7 +301,7 @@ the server is fully functional.
 3.  Tap your library → your audiobook → the first track. Audio should
     stream within a second or two, on Wi-Fi or cellular, anywhere.
 
-## Step 7: Daily use
+### Step 7: Daily use
 
 - **Playback speed:** 0.5×–3.0×. 0.85× is great for shadowing dialogue
   you don’t fully understand; 1.25× for review passes. (Enable “Remember
@@ -365,5 +372,5 @@ iPhone before leaving home, cached audio plays fully offline.
 
 Your course is now permanently available from any device on your
 tailnet, with proper progress tracking and no subscription. Next, in
-[Part 3](../03-pihole/README.md), we give the Pi a second job: blocking ads
-for every device on your home network with Pi-hole.
+[Chapter 3](../03-pihole/README.md), we give the Pi a second job: blocking
+ads for every device on your home network with Pi-hole.

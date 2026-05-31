@@ -129,9 +129,9 @@ networks:
 - **`ports: 53:53/tcp` and `53:53/udp`**, DNS uses **both** transports
   (UDP for almost everything, TCP for large responses), so both are
   published. They’re bound to all interfaces so the Pi answers DNS for
-  your LAN *and* over the tailnet. (In Part 3, before the proxy existed,
-  these were bound to the Pi’s LAN IP only, `${PIHOLE_IP}:53:53`; Part 4
-  widens them.)
+  your LAN *and* over the tailnet. (In Chapter 3, before the proxy
+  existed, these were bound to the Pi’s LAN IP only,
+  `${PIHOLE_IP}:53:53`; Chapter 4 widens them.)
 - **`ports: 8081:80/tcp`**, Pi-hole’s web UI listens on port 80 *inside*
   the container; we publish it on the host as **8081** so the host’s
   port 80 stays free for Caddy.
@@ -158,7 +158,7 @@ networks:
 - **`networks: homelab` + top-level `external: true`**, joins the shared
   proxy network *declaratively*. This is deliberate: attaching it by
   hand with `docker network connect` would be wiped by the next
-  `--force-recreate` (see the warning in [Part
+  `--force-recreate` (see the warning in [Chapter
   4](../04-pretty-urls/README.md)). In the file, it always re-attaches.
 
 ## `~/proxy/compose.yaml` + `Caddyfile`: the reverse proxy
@@ -236,7 +236,7 @@ home.home, homelab {
 - **`tls internal`**, the key directive. There’s no public certificate
   authority for a private `.home` name, so Caddy spins up its **own**
   local CA, signs a cert for each name, and serves HTTPS. You trust that
-  CA once per device (Part 4 Step 7) and the URLs get a real padlock.
+  CA once per device (Chapter 4 Step 7) and the URLs get a real padlock.
   Caddy also auto-redirects `http://` to `https://` for these names.
 - **`reverse_proxy <name>:<port>`**, forwards the request to that
   container over the `homelab` network. The port is the service’s
@@ -345,9 +345,10 @@ This is the only project with **two** services. Note Homepage has **no
 
 ## `~/audiobookshelf/compose.yaml`: Audiobookshelf
 
-The media server set up in [Part 2](../02-audiobookshelf/README.md). It’s the
-first stack you create, then [Part 4](../04-pretty-urls/README.md) adds the
-`networks` block so Caddy can reach it as `audiobookshelf:80`:
+The media server set up in [Chapter 2](../02-audiobookshelf/README.md).
+It’s the first stack you create, then [Chapter
+4](../04-pretty-urls/README.md) adds the `networks` block so Caddy can
+reach it as `audiobookshelf:80`:
 
 ``` yaml
 services:
@@ -392,8 +393,8 @@ under `media/`. All the volume paths are relative to that folder.
     art, kept next to the compose file so recreating the container loses
     nothing.
 - **`networks: homelab` + top-level `external: true`**, joins the shared
-  proxy network *declaratively*, exactly like Pi-hole. Added in Part 4;
-  before that the stack runs on its own default network. Declaring it
+  proxy network *declaratively*, exactly like Pi-hole. Added in Chapter
+  4; before that the stack runs on its own default network. Declaring it
   here (rather than a hand `docker network connect`) is what makes the
   attachment survive every recreate, see the warning under Pi-hole
   above.

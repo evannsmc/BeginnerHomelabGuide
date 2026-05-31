@@ -1,0 +1,57 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Beginner Homelab on a Raspberry Pi"
+  subtitle: "Self-host your media, block ads network-wide, get a one-URL control panel, reach everything from your phone, and route your devices through a VPN, all over a private Tailscale network"
+  author: "Evanns Morales-Cuadrado"
+  date: today
+  search: true
+  page-navigation: true
+  chapters:
+    - index.qmd
+    - part: "Volume I: Building the homelab"
+      chapters:
+        - chapter-1-foundation.qmd
+        - chapter-2-audiobookshelf.qmd
+        - chapter-3-pihole.qmd
+        - chapter-4-pretty-urls.qmd
+        - chapter-5-dashboard.qmd
+        - chapter-6-remoting-phone.qmd
+    - part: "Volume II: On the road and your devices"
+      chapters:
+        - chapter-7-vpn.qmd
+        - chapter-8-away-from-home.qmd
+        - chapter-9-phone-linux.qmd
+  appendices:
+    - appendix-a-compose-explained.qmd
+    - appendix-b-verify.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    highlight-style: github
+  pdf:
+    documentclass: scrreprt
+    papersize: letter
+    geometry:
+      - margin=1in
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    fontsize: 11pt
+    highlight-style: github
+    code-block-bg: true
+    code-block-border-left: "#268bd2"
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,breaksymbolleft={},breaksymbolright={},commandchars=\\\{\}}
+        \fvset{breaklines,breakanywhere,breaksymbolleft={},breaksymbolright={}}
+        \usepackage{emptypage}

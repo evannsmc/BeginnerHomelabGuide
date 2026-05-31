@@ -1,0 +1,115 @@
+# Preface. What this series builds {.unnumbered}
+
+This is a beginner-friendly guide to standing up a small **homelab** on a
+Raspberry Pi, organized into two **volumes** of short chapters. You start by
+building a foundation, then give it one job at a time. By the end you have one
+always-on Pi that serves your media, cleans the ads off every device you own,
+hands you a single dashboard URL, lets you reach everything from your phone, and
+can route your traffic through a VPN. And *every* piece is reachable from anywhere
+over a private [Tailscale](https://tailscale.com) network with nothing exposed to
+the public internet.
+
+## Volume I: Building the homelab
+
+1. **[Foundation: your Pi and your Tailscale network](chapter-1-foundation.qmd).**
+   Flash a headless 64-bit Linux with key-based SSH, install Docker, and put the
+   Pi, your laptop, and your phone on one private Tailscale network with MagicDNS,
+   reachable by name from anywhere.
+2. **[Streaming audiobooks with Audiobookshelf](chapter-2-audiobookshelf.qmd).**
+   Serve spoken audio from the Pi, streaming to your phone with proper resume
+   tracking. The running example is my own: a language course I ripped from CD so
+   I can study from anywhere without carrying the discs.
+3. **[Network-wide ad blocking with Pi-hole](chapter-3-pihole.qmd).** Run Pi-hole
+   as a DNS server and point your router at it, so every device on your home
+   network is ad-blocked with zero per-device setup.
+4. **[Pretty URLs: a reverse proxy and local DNS](chapter-4-pretty-urls.qmd).**
+   Add Caddy and local DNS so you can type `https://pihole.home` and
+   `https://abs.home` on your tailnet, no ports or IPs, with real HTTPS.
+5. **[A one-URL dashboard](chapter-5-dashboard.qmd).** Add Homepage and Portainer,
+   slotted into the proxy at `https://home.home` as a single landing page.
+6. **[Remoting into your machines from your phone](chapter-6-remoting-phone.qmd).**
+   Reach your Pi's terminal (Termius) and a full desktop (NoMachine) from your
+   phone, by Tailscale machine name.
+
+## Volume II: On the road and your devices
+
+7. **[VPN privacy: Aura, Mullvad, and your options](chapter-7-vpn.qmd).** What a
+   VPN does, how Aura compares to Mullvad, and what a Tailscale exit node is, so
+   you can pick the approach that fits.
+8. **[On the road: homelab, Pi-hole, and VPN away from home](chapter-8-away-from-home.qmd).**
+   The field manual for leaving the house, and the one rule for why homelab
+   access, Pi-hole, and a privacy VPN can't all run at once.
+9. **[Wiring your phone into your Linux machines](chapter-9-phone-linux.qmd).**
+   LocalSend and KDE Connect for file transfer and clipboard sharing over
+   Tailscale, plus the USB fallback for bulk photo offload.
+
+Two **appendices** back the parts up:
+[Appendix A](appendix-a-compose-explained.qmd) explains every Docker Compose file
+line by line (kept out of the main chapters so they stay readable), and
+[Appendix B](appendix-b-verify.qmd) is a "what should just work" reference, every
+URL and the one-line check that proves it's healthy, ideal as a post-reboot smoke
+test.
+
+## The hardware and accounts
+
+- **The always-on server.** I'm running this on a **Raspberry Pi 4 Model B
+  (8 GB RAM)** with a **32 GB microSD card**, in an **Argon ONE M.2 Aluminum
+  case** (passive-plus-fan cooling, with an M.2 slot for a future SSD), on
+  **Ubuntu Server 26.04 LTS (64-bit), headless** (no desktop, just SSH). That's
+  simply what I happen to use, and what these steps are written and tested on. You
+  don't need the exact same kit; anything similar (a Pi 4 or 5 with a few GB of
+  RAM and a 16 GB+ card, on a Debian/Ubuntu base) will follow along. There's
+  plenty of headroom here, since all the containers, configs, and a ripped audio
+  course together use only a few GB.
+- **A laptop/desktop** (Linux assumed) to flash the card and use as a client.
+- **A free Tailscale account.** One account, signed into on every device, is the
+  connective tissue for the entire series.
+- **An iPhone** (the apps in Chapters 2 and 9 also exist for Android; the commands
+  are identical).
+- **Docker** on the Pi, installed once in Chapter 1, reused by every later chapter.
+- A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapter 7 (both
+  optional, ~$5/month; Chapter 7 helps you choose).
+
+## Conventions used throughout
+
+- I'm running **Ubuntu Server 26.04 LTS** on the Pi, which is a
+  **Debian/Ubuntu-flavored** Linux, so commands use `apt`, `systemd`, and
+  `docker`.
+- Commands prefixed with `sudo` need administrator rights; the rest run as your
+  normal user.
+- **Placeholders, substitute your own.** Wherever you see a Tailscale address
+  like `100.x.y.z`, run `tailscale ip -4` on that machine to get the real one.
+  This guide names the Raspberry Pi `homelab` on the tailnet; its full DNS name
+  is therefore `homelab.<your-tailnet>.ts.net`, where `<your-tailnet>` is the
+  suffix shown on the **DNS** page of the Tailscale admin console (something
+  like `tail1a2b3.ts.net`). Substitute it wherever you see `your-tailnet.ts.net`.
+  Likewise, `/home/you/` stands in for your own home directory, and `you@homelab`
+  for your own username on the Pi.
+
+::: {.callout-note}
+## Why Tailscale is the spine of this series
+Every part avoids port forwarding, dynamic DNS, and exposing services to the
+public internet. Instead, each service binds to the Pi and is reached over an
+authenticated WireGuard mesh. The practical upshot: your homelab is private by
+default, works on locked-down corporate Wi-Fi, and needs no router
+configuration. You sign in once per device and everything just finds
+everything else.
+:::
+
+::: {.callout-important}
+## Security & secrets: read before you publish or push anything
+This guide is written to be **safe to commit to a public Git repo** and safe to
+follow. Two habits make that true, and they're applied throughout:
+
+- **Never put a real password, API token, or key in a file you commit.** Every
+  config below reads its secrets from a local `.env` file that is listed in
+  `.gitignore` and never leaves your machine.
+- **Nothing is exposed to the public internet.** Services are reached only over
+  your private tailnet or your home LAN, never by port-forwarding. Remote
+  access to the Pi uses SSH over Tailscale with **key-based authentication**
+  (set up in Chapter 1). Don't open router ports to any of this.
+
+If you fork this guide for your own site, scrub any real tailnet names, IPs, and
+usernames first, they're mildly identifying. This guide uses placeholders for
+exactly that reason.
+:::

@@ -5,15 +5,15 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 3. Network-wide ad blocking at home with Pi-hole
+# Chapter 3. Network-wide ad blocking at home with Pi-hole
 
-> **The payoff of this part:** every device on your home network,
+> **The payoff of this chapter:** every device on your home network,
 > laptops, phones, the smart TV, game consoles, IoT gadgets, has ads and
 > trackers stripped out *before they ever load*, with zero per-device
 > configuration.
 
-Across Parts 1–2 you put an always-on Raspberry Pi (`homelab`) on your
-tailnet and gave it its first job, Audiobookshelf. Pi-hole is the
+Across Chapters 1–2 you put an always-on Raspberry Pi (`homelab`) on
+your tailnet and gave it its first job, Audiobookshelf. Pi-hole is the
 natural second tenant: it’s a **DNS sinkhole**, a DNS server that
 answers “no such host” for domains known to serve ads, trackers, and
 malware, and forwards everything else to a real upstream resolver.
@@ -40,7 +40,9 @@ That router-level step is what makes this effortless: you configure one
 setting in one place, and every current and future device on your home
 network is covered without touching any of them individually.
 
-## Step 1: Free up port 53 on the Pi
+## Part A: Run Pi-hole on the Pi
+
+### Step 1: Free up port 53 on the Pi
 
 This is the one host-level snag, and it bites almost everyone, so we do
 it first. Pi-hole needs to listen on **port 53** (the DNS port). But
@@ -83,10 +85,10 @@ If step 4 prints a line mentioning `systemd-resolve`, the stub is still
 bound, re-check that the drop-in saved correctly and that you restarted
 the service.
 
-## Step 2: Run Pi-hole in Docker
+### Step 2: Run Pi-hole in Docker
 
-You already have a Docker workflow from Part 1, so we’ll keep Pi-hole in
-the same world rather than installing it natively. That means one
+You already have a Docker workflow from Chapter 1, so we’ll keep Pi-hole
+in the same world rather than installing it natively. That means one
 lifecycle to learn (`docker ...`), declarative config you can back up as
 a file, and no new system packages on the host.
 
@@ -197,13 +199,13 @@ docker compose logs --tail 20      # watch it come up
 >
 > ### Port 80: make sure it’s actually free
 >
-> Audiobookshelf from Part 2 publishes host port **13378**, so it does
-> *not* conflict with Pi-hole’s port 80. But if you’ve added anything
-> else that grabs host port 80, Pi-hole’s web UI won’t start. Check with
-> `sudo ss -tlpn | grep ':80'` before `docker compose up`. (In Part 4 we
-> put a reverse proxy on port 80 to give every service a clean URL, at
-> that point Pi-hole’s web UI moves to a different port, and we’ll
-> handle it there.)
+> Audiobookshelf from Chapter 2 publishes host port **13378**, so it
+> does *not* conflict with Pi-hole’s port 80. But if you’ve added
+> anything else that grabs host port 80, Pi-hole’s web UI won’t start.
+> Check with `sudo ss -tlpn | grep ':80'` before `docker compose up`.
+> (In Chapter 4 we put a reverse proxy on port 80 to give every service
+> a clean URL, at that point Pi-hole’s web UI moves to a different port,
+> and we’ll handle it there.)
 
 ### What the key settings do
 
@@ -241,7 +243,7 @@ docker compose logs --tail 20      # watch it come up
 > password command is now `pihole setpassword`. If a tutorial tells you
 > to edit `setupVars.conf`, it predates v6, ignore it.
 
-## Step 3: Set the admin password and log in
+### Step 3: Set the admin password and log in
 
 The web UI lives at `http://<pi-ip>/admin`. On your home network use the
 Pi’s LAN IP (e.g. `http://192.168.1.50/admin`); find it with
@@ -267,7 +269,9 @@ cd ~/pihole && docker compose up -d --force-recreate
 > single source of truth for the password; change it there, nowhere
 > else.
 
-## Step 4: Point your home network at Pi-hole
+## Part B: Point your home network at it
+
+### Step 4: Point your home network at Pi-hole
 
 This is the centerpiece. You want every device in the house to use
 Pi-hole as its DNS server without configuring each one. The cleanest way
@@ -312,7 +316,9 @@ settings to every device via DHCP when they join the Wi-Fi.
 > is exactly right; Pi-hole answering the *whole internet* is a problem.
 > Keep it on your home network.
 
-## Step 5: Add good blocklists
+## Part C: Add blocklists and verify
+
+### Step 5: Add good blocklists
 
 A fresh Pi-hole v6 already subscribes to **StevenBlack’s unified hosts
 list**, which is a strong baseline on its own. You can verify it under
@@ -353,7 +359,7 @@ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/pro.txt
 > surprises. Every time you add or remove a list, run **Update Gravity**
 > or nothing changes.
 
-## Step 6: Verify the whole thing
+### Step 6: Verify the whole thing
 
 Run through these in order; each isolates a different layer:
 
@@ -417,7 +423,7 @@ the router points back at Pi-hole (that’s a resolution loop).
   device.
 - **Add one or two quality blocklists** and run **Update Gravity**.
 
-Your homelab now does two jobs on your home network. In [Part
+Your homelab now does two jobs on your home network. In [Chapter
 4](../04-pretty-urls/README.md) we stop typing IP addresses and ports to
 reach these services, a small reverse proxy plus local DNS gives Pi-hole
 and Audiobookshelf clean names like **`https://pihole.home`** and

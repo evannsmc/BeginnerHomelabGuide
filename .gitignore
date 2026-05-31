@@ -7,3 +7,7 @@
 .DS_Store
 *.swp
 *~
+
+# Quarto render output for the book source (the final PDF is committed at repo root)
+book/_book/
+book/.quarto/
