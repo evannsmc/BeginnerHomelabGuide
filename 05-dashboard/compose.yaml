@@ -1,0 +1,35 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # Hostnames Caddy will forward here. Comma-separated, NO spaces.
+      HOMEPAGE_ALLOWED_HOSTS: home.home,homelab,homelab.your-tailnet.ts.net
+      # Widget secrets, injected from .env: never hard-coded in the config files.
+      HOMEPAGE_VAR_PIHOLE_PASSWORD: ${PIHOLE_PASSWORD:?set PIHOLE_PASSWORD in .env}
+      HOMEPAGE_VAR_ABS_TOKEN: ${ABS_TOKEN:-}
+    networks:
+      - homelab
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce:lts
+    container_name: portainer
+    ports:
+      - "9443:9443"          # HTTPS management UI (self-signed cert)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - homelab
+    restart: always
+
+networks:
+  homelab:
+    external: true           # the shared network created in Chapter 4
+
+volumes:
+  portainer_data:

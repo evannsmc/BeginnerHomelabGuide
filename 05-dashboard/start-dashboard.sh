@@ -2,7 +2,6 @@
 # Write the Homepage + Portainer compose file and start them (run on the Pi). Small self-contained helper; this is the setup I use and test, adapt as needed.
 set -euo pipefail
 
-docker network create homelab 2>/dev/null || true
 mkdir -p ~/dashboard/config && cd ~/dashboard
 SUFFIX=$(tailscale status --json 2>/dev/null | grep -o '"MagicDNSSuffix":"[^"]*"' | head -1 | cut -d'"' -f4)
 [ -n "$SUFFIX" ] && ALLOWED="home.home,homelab,homelab.$SUFFIX" || ALLOWED="home.home,homelab"

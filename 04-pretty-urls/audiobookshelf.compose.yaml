@@ -1,0 +1,16 @@
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - "13378:80"
+    volumes:
+      - ./media/Audiobooks:/audiobooks
+      - ./config:/config
+      - ./metadata:/metadata
+    networks:
+      - homelab
+    restart: unless-stopped
+networks:
+  homelab:
+    external: true

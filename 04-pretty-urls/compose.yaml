@@ -1,0 +1,21 @@
+services:
+  caddy:
+    container_name: caddy
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - homelab
+    restart: unless-stopped
+networks:
+  homelab:
+    external: true
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,13 @@
+- Links:
+    - Tailscale admin:
+        - abbr: TS
+          href: https://login.tailscale.com/admin/machines
+    - Router:
+        - abbr: RT
+          href: http://192.168.1.1
+    - Pi-hole docs:
+        - abbr: PH
+          href: https://docs.pi-hole.net
+    - Audiobookshelf docs:
+        - abbr: AB
+          href: https://www.audiobookshelf.org/docs

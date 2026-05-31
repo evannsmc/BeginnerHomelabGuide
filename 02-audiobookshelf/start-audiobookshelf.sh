@@ -2,9 +2,9 @@
 # Write the Audiobookshelf compose file and start the container (run on the Pi). Small self-contained helper; this is the setup I use and test, adapt as needed.
 set -euo pipefail
 
-# Folders are created by make-dirs.sh; run that first. This script only writes
-# the compose file and starts the container.
-docker network create homelab 2>/dev/null || true
+# Folders come from make-dirs.sh; run that first. This only writes the compose
+# and starts the container. Joining the shared 'homelab' network happens in
+# Chapter 4, not here.
 cd ~/audiobookshelf
 cat > compose.yaml <<'YAML'
 services:
@@ -17,12 +17,7 @@ services:
       - ./media/Audiobooks:/audiobooks    # add ./media/Podcasts:/podcasts later
       - ./config:/config
       - ./metadata:/metadata
-    networks:
-      - homelab
     restart: unless-stopped
-networks:
-  homelab:
-    external: true
 YAML
 printf 'config/\nmetadata/\nmedia/\n' > .gitignore
 docker compose up -d

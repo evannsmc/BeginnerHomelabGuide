@@ -2,7 +2,6 @@
 # Write the Caddy config + compose file, start it, and export its root CA (run on the Pi). Small self-contained helper; this is the setup I use and test, adapt as needed.
 set -euo pipefail
 
-docker network create homelab 2>/dev/null || true
 mkdir -p ~/proxy && cd ~/proxy
 cat > Caddyfile <<'CADDY'
 # tls internal: Caddy makes its own private CA and serves HTTPS for .home names.

@@ -1,0 +1,30 @@
+- Media:
+    - Audiobookshelf:
+        icon: audiobookshelf.png
+        href: https://abs.home                  # the pretty URL from Chapter 4
+        description: Audiobooks & language courses
+        server: my-docker
+        container: audiobookshelf              # -> live status dot + CPU/RAM
+        widget:
+          type: audiobookshelf
+          url: http://audiobookshelf:80         # container name + internal port (for widget data)
+          key: '{{HOMEPAGE_VAR_ABS_TOKEN}}'     # injected from .env, no real token in this file
+
+- Network:
+    - Pi-hole:
+        icon: pi-hole.png
+        href: https://pihole.home               # the pretty URL from Chapter 4
+        description: DNS ad-blocking
+        server: my-docker
+        container: pihole
+        widget:
+          type: pihole
+          url: http://pihole:80                    # container name + internal port
+          version: 6                               # REQUIRED for Pi-hole v6 (defaults to 5!)
+          key: '{{HOMEPAGE_VAR_PIHOLE_PASSWORD}}'  # injected from .env, no real password in this file
+
+- Management:
+    - Portainer:
+        icon: portainer.png
+        href: https://homelab:9443
+        description: Manage Docker containers

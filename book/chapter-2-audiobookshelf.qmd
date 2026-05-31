@@ -165,7 +165,7 @@ one `compose.yaml`, the same self-contained pattern every other service in this
 series uses (so it's one lifecycle to learn and a single file to back up).
 
 ```bash
-mkdir -p ~/audiobookshelf/config ~/audiobookshelf/metadata ~/audiobookshelf/media/Audiobooks
+mkdir -p ~/audiobookshelf/config ~/audiobookshelf/metadata    # media/Audiobooks already exists from Step 3
 cd ~/audiobookshelf
 
 cat > compose.yaml <<'EOF'

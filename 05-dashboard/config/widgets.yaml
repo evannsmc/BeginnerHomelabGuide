@@ -1,0 +1,13 @@
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+- search:
+    provider: duckduckgo
+    target: _blank
+- datetime:
+    format:
+      timeStyle: short
+- greeting:
+    text_size: xl
+    text: Welcome to the homelab

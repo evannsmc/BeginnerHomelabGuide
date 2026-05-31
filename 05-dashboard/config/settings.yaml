@@ -1,0 +1,17 @@
+title: My Homelab
+theme: dark
+color: slate
+headerStyle: boxed
+layout:
+  Media:
+    style: row
+    columns: 2
+  Network:
+    style: row
+    columns: 2
+  Management:
+    style: row
+    columns: 2
+  Links:                 # a bookmarks group (defined in bookmarks.yaml below)
+    style: row
+    columns: 4

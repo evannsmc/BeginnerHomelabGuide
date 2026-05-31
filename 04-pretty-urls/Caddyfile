@@ -1,0 +1,14 @@
+# tls internal: Caddy makes its own private CA and serves HTTPS for .home names.
+pihole.home {
+	tls internal
+	redir / /admin 302
+	reverse_proxy pihole:80
+}
+abs.home {
+	tls internal
+	reverse_proxy audiobookshelf:80
+}
+home.home, homelab {
+	tls internal
+	reverse_proxy homepage:3000
+}

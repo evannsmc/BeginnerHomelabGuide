@@ -118,7 +118,11 @@ to verify it).
 Other folders follow the same shape, e.g. `02-audiobookshelf/` has
 `make-dirs.sh` + `start-audiobookshelf.sh`, `03-pihole/` has `free-port-53.sh` +
 `start-pihole.sh`, and so on. (`06-remoting-phone` and `08-away-from-home` have no
-scripts.) In the repo root:
+scripts.) The service chapters also ship the **actual config files** that chapter
+has you create, ready to grab: the `compose.yaml` (and in `04-pretty-urls/` the
+`Caddyfile` plus the Chapter-4 networked rewrites, and in `05-dashboard/` the
+Homepage `config/`). Real secrets stay out; an `.env.example` shows the shape
+where a `.env` is needed. In the repo root:
 
 - **[`Beginner-Homelab-on-a-Raspberry-Pi.pdf`](Beginner-Homelab-on-a-Raspberry-Pi.pdf)**.
   The entire guide as one book.
