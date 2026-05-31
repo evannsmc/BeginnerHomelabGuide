@@ -141,12 +141,18 @@ cat <<NOTE
      - Turn ON "Override local DNS".
    Then from any device:  ping home.home   (should answer from $TSIP)
 
-2. Trust Caddy's root CA so bare names open with a padlock (copy the file off
-   first, e.g.  scp you@homelab:~/proxy/caddy-root-ca.crt . ):
+2. Trust Caddy's root CA so bare names open with a padlock. Send the cert to your
+   devices over the tailnet with Taildrop (run 'tailscale status' for peer names;
+   if the Pi says "file access denied", run 'sudo tailscale set --operator=$USER'
+   once, or send from your laptop):
+     tailscale file cp ~/proxy/caddy-root-ca.crt <laptop-name>:
+     tailscale file cp ~/proxy/caddy-root-ca.crt <iphone-name>:
+   Then install it:
      - Linux:  sudo cp caddy-root-ca.crt /usr/local/share/ca-certificates/ \
                && sudo update-ca-certificates
                (Firefox: Settings -> Certificates -> Authorities -> Import)
-     - iPhone: AirDrop/email the .crt -> install profile -> Settings -> General
-               -> About -> Certificate Trust Settings -> Enable Full Trust.
+     - iPhone: Tailscale app -> save the received .crt to Files -> open it ->
+               install profile -> Settings -> General -> About -> Certificate
+               Trust Settings -> Enable Full Trust.
 ============================================================================
 NOTE

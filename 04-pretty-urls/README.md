@@ -327,12 +327,28 @@ docker exec caddy cat /data/caddy/pki/authorities/local/root.crt \
   > ~/proxy/caddy-root-ca.crt
 ```
 
+Now get that file onto each device. Since every device is already on
+your tailnet, the tidiest way is **Taildrop** — Tailscale’s built-in
+file send between your own machines, no AirDrop, no email, no cable:
+
+``` bash
+# from the Pi (or any machine that has the file), send to a peer by its name:
+tailscale file cp ~/proxy/caddy-root-ca.crt <laptop-name>:
+tailscale file cp ~/proxy/caddy-root-ca.crt <iphone-name>:
+```
+
+Find the exact peer names with `tailscale status`. (If the Pi answers
+`Access denied: file access denied`, run
+`sudo tailscale set --operator=$USER` once so the Tailscale CLI works
+without `sudo`, then retry — or just send from a machine where it
+already works.)
+
 Then install `caddy-root-ca.crt` on each device:
 
-- **Linux laptop (system-wide):**
+- **Linux laptop (system-wide):** receive the Taildrop file (it lands in
+  your Downloads, or run `tailscale file get .`), then:
 
   ``` bash
-  # copy the file over first, e.g. scp you@homelab:~/proxy/caddy-root-ca.crt .
   sudo cp caddy-root-ca.crt /usr/local/share/ca-certificates/caddy-root-ca.crt
   sudo update-ca-certificates
   ```
@@ -341,11 +357,14 @@ Then install `caddy-root-ca.crt` on each device:
   → *Certificates* → **View Certificates** → *Authorities* → **Import**
   the file and tick “Trust this CA to identify websites.”
 
-- **iPhone:** AirDrop or email yourself `caddy-root-ca.crt` and open it
-  → **Settings → General → VPN & Device Management → Install** the
-  profile. Then — this second step is the one people miss — **Settings →
-  General → About → Certificate Trust Settings** and toggle **on**
-  “Enable Full Trust” for the Caddy Local Authority.
+- **iPhone:** open the **Tailscale** app, tap the received
+  `caddy-root-ca.crt`, and **Save to Files**. Open it from the **Files**
+  app → iOS says “Profile Downloaded” → **Settings → General → VPN &
+  Device Management → Install** the profile. Then — this second step is
+  the one people miss — **Settings → General → About → Certificate Trust
+  Settings** and toggle **on** “Enable Full Trust” for the Caddy Local
+  Authority. (AirDrop or email work too, but Taildrop keeps it on the
+  tailnet.)
 
 Now reload `https://home.home` — the warning is gone, and typing the
 bare name works.
