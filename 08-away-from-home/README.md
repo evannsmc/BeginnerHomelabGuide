@@ -1,6 +1,6 @@
 > [!NOTE]
 > Part of my personal homelab guide, written around my own use case. This chapter
-> is mostly reading/app setup (no scripts here). See the [main README](../README.md)
+> is mostly reading / app setup (no scripts here). See the [main README](../README.md)
 > for the full picture.
 
 
