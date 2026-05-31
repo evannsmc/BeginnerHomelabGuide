@@ -307,7 +307,7 @@ settings to every device via DHCP when they join the Wi-Fi.
     That’s the address every device will be told to use for DNS.
 2.  In the router’s settings, find the **DNS server** field, usually
     under *DHCP*, *LAN*, or *Internet* settings, and set the **primary
-    DNS** to the Pi’s IP (`192.168.1.50`).
+    DNS** to the Pi’s IP (e.g. `192.168.1.50`).
 3.  **Leave the secondary DNS blank if you can.** This is
     counterintuitive: a secondary DNS (like `8.8.8.8`) feels like a
     safety net, but devices freely use *either* server, so half your
@@ -395,9 +395,10 @@ dig +short doubleclick.net @192.168.1.50    # 0.0.0.0 = LAN clients can use it
 ```
 
 Then the real-world test: on a device connected to your home Wi-Fi, open
-a normally ad-heavy site or app, then watch the **Query Log** at
-`http://192.168.1.50/admin` from your laptop. You should see that
-device’s LAN IP making queries, with ad domains marked blocked.
+a normally ad-heavy site or app, then watch the **Query Log** at your
+Pi’s admin page (e.g. `http://192.168.1.50/admin`) from your laptop. You
+should see that device’s LAN IP making queries, with ad domains marked
+blocked.
 
 If a device’s queries don’t appear at all, it’s still using its old DNS,
 renew its DHCP lease (toggle Wi-Fi off/on) so it picks up the router’s

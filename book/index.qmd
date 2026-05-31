@@ -85,6 +85,13 @@ test.
   like `tail1a2b3.ts.net`). Substitute it wherever you see `your-tailnet.ts.net`.
   Likewise, `/home/you/` stands in for your own home directory, and `you@homelab`
   for your own username on the Pi.
+- **Toy example values, swap in yours.** Some things need a concrete number to
+  show, so the guide picks a running example and reuses it. The big ones are the
+  Pi's home (LAN) IP, written as **`192.168.1.50`**, and the router, written as
+  **`192.168.1.1`**. *Yours will almost certainly differ* (find the Pi's with
+  `hostname -I`, the router's on the back of the router or in its app). Whenever
+  you see one of these, read it as "e.g." and use your own. The same goes for any
+  bare LAN IP in a command or screenshot.
 
 ::: {.callout-note}
 ## Why Tailscale is the spine of this series

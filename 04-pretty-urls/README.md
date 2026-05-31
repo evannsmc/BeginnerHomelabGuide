@@ -269,9 +269,9 @@ your devices in Step 7.
 ### Step 4: Add the `.home` names to Pi-hole’s DNS
 
 Make the names resolve to the Pi. In the Pi-hole admin UI
-(`http://192.168.1.50:8081/admin` for now), go to **Settings → Local DNS
-Records** and add one **A record** per name, all pointing at the Pi’s
-**Tailscale** IP (`tailscale ip -4` on the Pi):
+(e.g. `http://192.168.1.50:8081/admin` for now), go to **Settings →
+Local DNS Records** and add one **A record** per name, all pointing at
+the Pi’s **Tailscale** IP (`tailscale ip -4` on the Pi):
 
 | Domain        | IP          |
 |---------------|-------------|
