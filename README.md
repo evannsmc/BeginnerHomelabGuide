@@ -33,13 +33,13 @@ this guide will change with it, and I'll write up what I learn along the way,
 including the parts I got wrong.
 
 > [!IMPORTANT]
-> ### The `setup.sh` scripts are built for my setup
-> Every `setup.sh` in this repo automates the way I set up my own homelab for my
-> own use case. Treat them as worked examples to read and learn from, not a
-> universal installer. Some of it will fit you and some of it won't. Read a
-> script before you run it, and change anything that doesn't match your hardware,
-> your services, or what you actually need. If a part isn't useful to you, skip
-> it.
+> ### The scripts are small, generic helpers, built around my setup
+> Each folder holds a few **small, self-contained** scripts for the basic steps
+> only: updating the system, installing Docker and Tailscale, making folders, and
+> starting containers. They deliberately do **not** automate my use-case-specific
+> bits (like ripping and copying my own audio); those live in the guide text, not
+> in a script. The scripts still reflect the choices I made for my own homelab, so
+> read one before you run it and adapt it to your own hardware and needs.
 
 > [!NOTE]
 > ### What this is (and the honest caveats)
@@ -49,25 +49,30 @@ including the parts I got wrong.
 > - **Case:** an **Argon ONE M.2 Aluminum** case (keeps it cool and tidy; the
 >   M.2 slot is there for a future SSD upgrade, not used yet).
 > - **OS:** **Ubuntu Server 26.04 LTS (64-bit), headless** (no desktop, SSH only).
->   Raspberry Pi OS Lite works the same way, every command is identical.
 > - It's a learning project, not a 99.99%-uptime production setup. It's a good way
 >   to get comfortable with Docker, DNS, and self-hosting.
 
-## 🚀 Quick start
+## 🚀 How to use this
 
-On a Pi you've already flashed with a headless 64-bit Linux (Ubuntu Server
-26.04 LTS or Raspberry Pi OS Lite, see [Part 1](01-foundation/README.md)) and
-signed into Tailscale:
+There's no one big installer. You **work through the guide part by part**, and
+each folder gives you a `README.md` (the walkthrough), a PDF of that part, and a
+few small helper scripts for the basic steps. A typical flow on a freshly
+flashed, Tailscale-signed-in Pi (see [Part 1](01-foundation/README.md)):
 
 ```bash
 git clone https://github.com/evannsmc/BeginnerHomelabGuide.git
 cd BeginnerHomelabGuide
-chmod +x install-all.sh */setup.sh
-./install-all.sh          # builds Parts 1–5, prompting for timezone + passwords
+
+# read 01-foundation/README.md, then run its helpers:
+01-foundation/update-system.sh
+01-foundation/install-docker.sh
+01-foundation/install-tailscale.sh
+# ...then move on to 02-audiobookshelf, 03-pihole, and so on.
 ```
 
-Prefer to go slow and understand each piece? Do it **part by part** instead.
-Each folder is self-contained (read its `README.md`, then run its `setup.sh`).
+Read a script before running it. Each one does a single basic task; the
+use-case-specific steps (ripping your own audio, pointing your router's DNS,
+trusting the HTTPS cert) are explained in the part's README, not scripted.
 
 ## 📖 The parts
 
@@ -92,21 +97,26 @@ to verify it).
 
 ```
 01-foundation/
-├── README.md     ← the full guide for this part (copy-paste friendly)
-├── 01-foundation.pdf   ← the same part as a standalone PDF
-└── setup.sh      ← runs this part's automatable steps
+├── README.md            ← the full guide for this part (copy-paste friendly)
+├── 01-foundation.pdf    ← the same part as a standalone PDF
+├── update-system.sh     ← one small helper per basic step
+├── install-docker.sh
+└── install-tailscale.sh
 ```
 
-And in the repo root:
+Other folders follow the same shape, e.g. `02-audiobookshelf/` has
+`make-dirs.sh` + `start-audiobookshelf.sh`, `03-pihole/` has `free-port-53.sh` +
+`start-pihole.sh`, and so on. (`07-away-from-home` is all concept, so it has no
+scripts.) In the repo root:
 
 - **[`Beginner-Homelab-on-a-Raspberry-Pi.pdf`](Beginner-Homelab-on-a-Raspberry-Pi.pdf)**.
   The entire guide as one book.
-- **`install-all.sh`** runs Parts 1–5 end-to-end on the Pi.
 
-## 🔐 What's automated vs. what you do by hand
+## 🔐 What the scripts cover vs. what you do by hand
 
-The scripts do everything that *can* be safely automated on the Pi. A few steps
-are inherently manual and the scripts print them clearly:
+The helper scripts cover only the **basic, generic** steps (update, install
+Docker/Tailscale, make folders, start containers). Everything use-case-specific
+or interactive you do yourself, guided by each part's README:
 
 - **Flashing the SD card** (done on your laptop with Raspberry Pi Imager).
 - **Signing into Tailscale** (opens a browser sign-in) and **renaming the Pi**
@@ -115,7 +125,8 @@ are inherently manual and the scripts print them clearly:
   on *Override local DNS*). This is what makes `*.home` and ad-blocking work on
   all your devices.
 - **Pointing your router's DNS** at the Pi (Part 3) for non-Tailscale devices.
-- Ripping your own audio, buying a VPN, installing phone apps.
+- **Trusting Caddy's HTTPS cert** on your devices (Part 4).
+- Ripping and copying your own audio, buying a VPN, installing phone apps.
 
 ## 🛟 Safety & privacy
 
@@ -125,7 +136,8 @@ are inherently manual and the scripts print them clearly:
   `you@homelab`).
 - **Nothing is port-forwarded.** Services are reached only over your
   authenticated Tailscale mesh or your home LAN.
-- Re-running a `setup.sh` is safe. Steps skip or recreate cleanly.
+- The scripts are safe to re-run. Starting a container that's already up just
+  reconciles it; nothing is destructive.
 
 ---
 

@@ -1,21 +1,21 @@
 > [!NOTE]
-> This is part of my personal homelab guide. The `setup.sh` in this folder
-> automates *my* setup for *my* use case, so not all of it will apply to you.
-> Read it before running and adapt it to your own hardware and needs. See the
-> [main README](../README.md) for the full picture.
+> Part of my personal homelab guide. The scripts in this folder are small, generic
+> helpers (update, install, make folders, start containers); the use-case-specific
+> steps live in the text below, not in a script. They reflect my own setup, so read
+> them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 4 — Pretty URLs: a reverse proxy + local DNS
+# Part 4. Pretty URLs: a reverse proxy + local DNS
 
 > **The payoff of this part:** type a bare **`pihole.home`** or
-> **`abs.home`** in any browser on your tailnet — at home or on cellular
-> — and land on the right service over HTTPS, no port numbers, no IP
+> **`abs.home`** in any browser on your tailnet (at home or on cellular)
+> and land on the right service over HTTPS, no port numbers, no IP
 > addresses, no scheme to type. And a pattern you’ll reuse for every
 > service you add from here on.
 
 Right now you reach your two services awkwardly:
 `http://192.168.1.50/admin` for Pi-hole, `http://homelab:13378` for
-Audiobookshelf — an IP here, a port there. This part introduces the
+Audiobookshelf, an IP here, a port there. This part introduces the
 machinery that gives **every** service one clean name, starting with
 these two. When we add the dashboard in [Part 5](../05-dashboard/README.md),
 it’ll slot into the same system in three lines.
@@ -25,7 +25,7 @@ it’ll slot into the same system in three lines.
 > ### Why not `pihole.com`?
 >
 > A `.com` (or any public) name belongs to whoever registered it on the
-> internet — you can’t point `pihole.com` at your Pi any more than you
+> internet, you can’t point `pihole.com` at your Pi any more than you
 > can point `google.com` at it. We use a **private** suffix, `.home`,
 > that exists only on *your* network.
 
@@ -34,13 +34,13 @@ it’ll slot into the same system in three lines.
 A working URL needs two separate things:
 
 1.  **The name has to resolve to your Pi.** `pihole.home` must turn into
-    the Pi’s address — that’s **DNS** (we add records to Pi-hole and let
+    the Pi’s address, that’s **DNS** (we add records to Pi-hole and let
     Tailscale carry them to every device).
 2.  **Traffic hitting the Pi has to reach the right service.**
     `pihole.home` and `abs.home` both arrive on the Pi’s web ports
     (80/443), but Pi-hole and Audiobookshelf listen on *different*
     ports. Something must read the requested name and forward to the
-    correct backend — a **reverse proxy** (we’ll use **Caddy**, the
+    correct backend, a **reverse proxy** (we’ll use **Caddy**, the
     simplest to configure). Caddy also gives each name an HTTPS
     certificate from its own private CA, so the URLs get a real padlock.
 
@@ -49,7 +49,7 @@ A working URL needs two separate things:
       pihole.home  ─DNS─►  the Pi (443)  ─Caddy routes by name─►  pihole:80
       abs.home     ─DNS─►  the Pi (443)  ─Caddy routes by name─►  audiobookshelf:80
 
-## Step 1 — Create the shared Docker network and put Audiobookshelf on it
+## Step 1: Create the shared Docker network and put Audiobookshelf on it
 
 Caddy reaches each backend by **container name** (`pihole`,
 `audiobookshelf`), which only works if they share a Docker network.
@@ -60,7 +60,7 @@ docker network create homelab
 ```
 
 Both Audiobookshelf (Part 2) and Pi-hole (Part 3) are **Compose
-projects**, so we attach each to the network the *declarative* way — by
+projects**, so we attach each to the network the *declarative* way, by
 adding it to the project’s `compose.yaml` (see the callout for why
 that’s the only attachment that sticks). Start with Audiobookshelf: add
 the `networks` blocks to `~/audiobookshelf/compose.yaml`:
@@ -76,8 +76,7 @@ services:
       - "13378:80"
 
     volumes:
-      - ${HOME}/Audiobooks:/audiobooks
-      - ${HOME}/Audiobooks-drill:/audiobooks-drill
+      - ./media/Audiobooks:/audiobooks
       - ./config:/config
       - ./metadata:/metadata
 
@@ -93,23 +92,23 @@ EOF
 ( cd ~/audiobookshelf && docker compose up -d --force-recreate )
 ```
 
-Any container on the `homelab` network can now reach the others by name
-— no IP addresses needed between containers.
+Any container on the `homelab` network can now reach the others by name,
+no IP addresses needed between containers.
 
 > [!WARNING]
 >
 > ### Attach Compose services in the Compose file, not with `docker network connect`
 >
 > It’s tempting to run `docker network connect homelab audiobookshelf`
-> instead — but it won’t survive. Any time you recreate the container
+> instead, but it won’t survive. Any time you recreate the container
 > (`docker compose up --force-recreate`, or an update), **a recreate
-> rebuilds it with only the networks declared in its `compose.yaml`** —
-> a network you attached by hand is silently dropped, and Caddy would
-> then fail to resolve the backend. So for every Compose service we add
-> the `homelab` network *inside* the Compose file, where a recreate
-> always re-attaches it. Pi-hole gets the same treatment in Step 2.
+> rebuilds it with only the networks declared in its `compose.yaml`**, a
+> network you attached by hand is silently dropped, and Caddy would then
+> fail to resolve the backend. So for every Compose service we add the
+> `homelab` network *inside* the Compose file, where a recreate always
+> re-attaches it. Pi-hole gets the same treatment in Step 2.
 
-## Step 2 — Free port 80 and extend Pi-hole onto the tailnet
+## Step 2: Free port 80 and extend Pi-hole onto the tailnet
 
 Three changes to Pi-hole’s `~/pihole/compose.yaml`, all needed before
 the proxy works:
@@ -119,11 +118,11 @@ the proxy works:
 - **Listen on the tailnet, not just the LAN.** In Part 3 you bound
   Pi-hole to your LAN IP because it was a home-only service. To make
   `.home` names (and Pi-hole’s own ad-blocking) work *everywhere*,
-  Pi-hole’s DNS must also answer on the Pi’s Tailscale interface — so
+  Pi-hole’s DNS must also answer on the Pi’s Tailscale interface, so
   drop the `${PIHOLE_IP}:` prefix and let it listen on all interfaces.
 - **Join the `homelab` network declaratively** (per the Step 1 callout)
-  so Caddy can reach it as `pihole:80`, and so the recreate below — and
-  every future `docker compose up` — re-attaches it automatically.
+  so Caddy can reach it as `pihole:80`, and so the recreate below, and
+  every future `docker compose up`, re-attaches it automatically.
 
 Replace `~/pihole/compose.yaml` with this updated version (the `ports:`
 and new `networks:` blocks are the only changes from Part 3):
@@ -178,10 +177,10 @@ cd ~/pihole && docker compose up -d --force-recreate
 > who should be able to use it.
 
 Pi-hole’s admin UI now lives at `http://192.168.1.50:8081/admin` (your
-Pi’s LAN IP) — but in a moment you’ll reach it as `https://pihole.home`
+Pi’s LAN IP), but in a moment you’ll reach it as `https://pihole.home`
 instead.
 
-## Step 3 — Deploy Caddy
+## Step 3: Deploy Caddy
 
 Caddy is its own small stack:
 
@@ -189,7 +188,7 @@ Caddy is its own small stack:
 mkdir -p ~/proxy && cd ~/proxy
 ```
 
-Create `~/proxy/Caddyfile` — the entire routing table:
+Create `~/proxy/Caddyfile`, the entire routing table:
 
 ``` bash
 cat > Caddyfile <<'EOF'
@@ -197,7 +196,7 @@ cat > Caddyfile <<'EOF'
 # built-in certificate authority (no public CA issues certs for a private TLD).
 # Caddy then serves HTTPS on 443 and auto-redirects http:// -> https://. Once you
 # trust Caddy's local CA on your devices (Step 7), a bare `pihole.home` typed in
-# the browser just works — no scheme, no warning, real padlock.
+# the browser just works: no scheme, no warning, real padlock.
 
 pihole.home {
     tls internal
@@ -249,8 +248,8 @@ docker compose up -d
 docker compose logs --tail 20
 ```
 
-Caddy listens on `0.0.0.0:80` and `0.0.0.0:443` — all interfaces,
-including the Pi’s Tailscale `100.x.y.z` — and reaches each backend by
+Caddy listens on `0.0.0.0:80` and `0.0.0.0:443`, all interfaces,
+including the Pi’s Tailscale `100.x.y.z`, and reaches each backend by
 container name over the `homelab` network, so it ignores host port
 mappings entirely. That’s why moving Pi-hole’s *host* web port to 8081
 doesn’t bother Caddy: it talks to `pihole:80` inside the network. On
@@ -258,7 +257,7 @@ first start, `tls internal` makes Caddy generate a local certificate
 authority and sign a cert for each `.home` name; you’ll trust that CA on
 your devices in Step 7.
 
-## Step 4 — Add the `.home` names to Pi-hole’s DNS
+## Step 4: Add the `.home` names to Pi-hole’s DNS
 
 Make the names resolve to the Pi. In the Pi-hole admin UI
 (`http://192.168.1.50:8081/admin` for now), go to **Settings → Local DNS
@@ -276,11 +275,11 @@ Records** and add one **A record** per name, all pointing at the Pi’s
 >
 > A DNS record holds one address. Pointing these at the Pi’s `100.x.y.z`
 > tailnet address makes them reachable from *anywhere* a device is on
-> your tailnet — home Wi-Fi or cellular alike. Caddy is listening on
-> that address (Step 3), so the traffic lands. (This assumes Tailscale
-> is running on the device, which is the premise of the whole series.)
+> your tailnet, home Wi-Fi or cellular alike. Caddy is listening on that
+> address (Step 3), so the traffic lands. (This assumes Tailscale is
+> running on the device, which is the premise of the whole series.)
 
-## Step 5 — Make Pi-hole your tailnet’s DNS
+## Step 5: Make Pi-hole your tailnet’s DNS
 
 For `*.home` to resolve on every device, your devices must ask
 **Pi-hole** for DNS. In the Tailscale admin console
@@ -289,7 +288,7 @@ For `*.home` to resolve on every device, your devices must ask
 1.  **Add nameserver → Custom**, enter the Pi’s Tailscale IP
     (`100.x.y.z`), save.
 2.  Turn on **Override local DNS**. Now every tailnet device resolves
-    through Pi-hole — so `*.home` names work, *and* you get Pi-hole
+    through Pi-hole, so `*.home` names work, *and* you get Pi-hole
     ad-blocking on every device, even on cellular.
 
 > [!NOTE]
@@ -303,7 +302,7 @@ For `*.home` to resolve on every device, your devices must ask
 > URLs. ([Part 7](../07-away-from-home/README.md) discusses how this DNS
 > choice interacts with VPNs when you’re away from home.)
 
-## Step 6 — Try it
+## Step 6: Try it
 
 From your laptop or phone, anywhere on the tailnet:
 
@@ -312,10 +311,10 @@ From your laptop or phone, anywhere on the tailnet:
 
 No ports, no IPs. To confirm resolution, `ping pihole.home` should
 answer from the Pi’s `100.x.y.z`. Until you do Step 7, your browser will
-warn that the certificate isn’t trusted (it’s Caddy’s private CA) —
+warn that the certificate isn’t trusted (it’s Caddy’s private CA),
 that’s expected, and Step 7 removes the warning for good.
 
-## Step 7 — Trust Caddy’s certificate (so bare names *just work*)
+## Step 7: Trust Caddy’s certificate (so bare names *just work*)
 
 Without this step, typing a bare `pihole.home` is frustrating: browsers
 try **`https://` first**, and because they don’t yet trust Caddy’s
@@ -333,8 +332,8 @@ docker exec caddy cat /data/caddy/pki/authorities/local/root.crt \
 ```
 
 Now get that file onto each device. Since every device is already on
-your tailnet, the tidiest way is **Taildrop** — Tailscale’s built-in
-file send between your own machines, no AirDrop, no email, no cable:
+your tailnet, the tidiest way is **Taildrop**, Tailscale’s built-in file
+send between your own machines, no AirDrop, no email, no cable:
 
 ``` bash
 # from the Pi (or any machine that has the file), send to a peer by its name:
@@ -345,8 +344,8 @@ tailscale file cp ~/proxy/caddy-root-ca.crt <iphone-name>:
 Find the exact peer names with `tailscale status`. (If the Pi answers
 `Access denied: file access denied`, run
 `sudo tailscale set --operator=$USER` once so the Tailscale CLI works
-without `sudo`, then retry — or just send from a machine where it
-already works.)
+without `sudo`, then retry, or just send from a machine where it already
+works.)
 
 Then install `caddy-root-ca.crt` on each device:
 
@@ -365,31 +364,31 @@ Then install `caddy-root-ca.crt` on each device:
 - **iPhone:** open the **Tailscale** app, tap the received
   `caddy-root-ca.crt`, and **Save to Files**. Open it from the **Files**
   app → iOS says “Profile Downloaded” → **Settings → General → VPN &
-  Device Management → Install** the profile. Then — this second step is
-  the one people miss — **Settings → General → About → Certificate Trust
+  Device Management → Install** the profile. Then (this second step is
+  the one people miss) **Settings → General → About → Certificate Trust
   Settings** and toggle **on** “Enable Full Trust” for the Caddy Local
   Authority. (AirDrop or email work too, but Taildrop keeps it on the
   tailnet.)
 
-Now reload `https://home.home` — the warning is gone, and typing the
-bare name works.
+Now reload `https://home.home`, the warning is gone, and typing the bare
+name works.
 
 > [!NOTE]
 >
 > ### Why a private CA instead of a real certificate
 >
 > A real, publicly-trusted certificate requires a domain **you own** and
-> a public CA (Let’s Encrypt) that can verify it — which can’t be done
+> a public CA (Let’s Encrypt) that can verify it, which can’t be done
 > for a private `.home` name. Caddy’s internal CA sidesteps that
 > entirely: it mints certificates locally and you tell *your* devices to
 > trust *that* CA. The trade-off is the one-time install above. (If you
 > ever buy a real domain, point a subdomain at the Pi and drop
-> `tls internal` — Caddy will fetch a real certificate automatically,
-> and you can remove the root cert from your devices.)
+> `tls internal`, Caddy will fetch a real certificate automatically, and
+> you can remove the root cert from your devices.)
 
 ## The pattern you’ll reuse
 
-Every service from here on gets a pretty URL the same way — three small
+Every service from here on gets a pretty URL the same way, three small
 steps:
 
 1.  Put its container on the `homelab` network.
@@ -399,7 +398,7 @@ steps:
     `docker compose restart    caddy` (in `~/proxy`).
 
 Because you’ve already trusted Caddy’s CA, the new name gets a trusted
-cert automatically — no per-service certificate work. [Part
+cert automatically, no per-service certificate work. [Part
 5](../05-dashboard/README.md) does exactly this for the dashboard, giving it
 `https://home.home`.
 
@@ -428,6 +427,6 @@ cert automatically — no per-service certificate work. [Part
 - **Trusting Caddy’s root CA** on each device makes bare names open over
   HTTPS with no warning and no scheme.
 
-You now have clean, portable URLs — and a repeatable recipe for every
+You now have clean, portable URLs, and a repeatable recipe for every
 service to come. Next, [Part 5](../05-dashboard/README.md) adds a dashboard
 that ties them all together behind `https://home.home`.

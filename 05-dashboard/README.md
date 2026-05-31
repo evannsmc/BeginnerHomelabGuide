@@ -1,20 +1,20 @@
 > [!NOTE]
-> This is part of my personal homelab guide. The `setup.sh` in this folder
-> automates *my* setup for *my* use case, so not all of it will apply to you.
-> Read it before running and adapt it to your own hardware and needs. See the
-> [main README](../README.md) for the full picture.
+> Part of my personal homelab guide. The scripts in this folder are small, generic
+> helpers (update, install, make folders, start containers); the use-case-specific
+> steps live in the text below, not in a script. They reflect my own setup, so read
+> them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Part 5 — A one-URL dashboard at `https://home.home`
+# Part 5. A one-URL dashboard at `https://home.home`
 
 > **The payoff of this part:** open any browser on your tailnet, type
 > **`https://home.home`**, and land on a clean dashboard that shows your
-> services at a glance and links into a full Docker management console —
+> services at a glance and links into a full Docker management console,
 > the single front door that ties everything together.
 
 Part 4 gave individual services clean names (`https://pihole.home`,
 `https://abs.home`). This part adds the *landing page* that gathers them
-in one place, plus a real management GUI — and it slots into the reverse
+in one place, plus a real management GUI, and it slots into the reverse
 proxy you built in Part 4 using the exact three-step pattern from the
 end of that chapter.
 
@@ -22,8 +22,8 @@ We’ll install two complementary tools:
 
 | Tool | What it does | Why both |
 |----|----|----|
-| **Homepage** | A fast, configurable dashboard with live “tiles” for each service | The pretty front door — *view* status, click through to everything |
-| **Portainer** | A full web GUI for Docker | The *manage* half — start/stop/restart containers, read logs, update images, all by clicking |
+| **Homepage** | A fast, configurable dashboard with live “tiles” for each service | The pretty front door, *view* status, click through to everything |
+| **Portainer** | A full web GUI for Docker | The *manage* half, start/stop/restart containers, read logs, update images, all by clicking |
 
 Homepage can *show* container status but can’t *control* containers;
 Portainer *controls* Docker beautifully but isn’t a customizable landing
@@ -34,14 +34,14 @@ links to Portainer with a single tile.
 >
 > ### Why Homepage over CasaOS/Cockpit/Homarr
 >
-> **CasaOS** wants to own the whole box and install its own Docker stack
-> — it fights the hand-rolled containers you’ve built so far.
+> **CasaOS** wants to own the whole box and install its own Docker
+> stack. It fights the hand-rolled containers you’ve built so far.
 > **Cockpit** manages the host OS, not Docker, so it’s off-target here.
 > **Homarr** is a great click-to-edit alternative if you hate YAML.
 > Homepage wins for a written guide because its config is plain text you
 > can copy-paste, back up, and reproduce exactly.
 
-## Step 1 — Deploy Homepage and Portainer
+## Step 1: Deploy Homepage and Portainer
 
 Make the project folder (one stack for the whole control panel):
 
@@ -49,7 +49,7 @@ Make the project folder (one stack for the whole control panel):
 mkdir -p ~/dashboard && cd ~/dashboard
 ```
 
-Create `~/dashboard/compose.yaml`. Note Homepage has **no host port** —
+Create `~/dashboard/compose.yaml`. Note Homepage has **no host port**,
 Caddy (from Part 4) is the front door on port 80 and will reach Homepage
 by container name over the shared `homelab` network:
 
@@ -64,7 +64,7 @@ services:
     environment:
       # Hostnames Caddy will forward here. Comma-separated, NO spaces.
       HOMEPAGE_ALLOWED_HOSTS: home.home,homelab,homelab.your-tailnet.ts.net
-      # Widget secrets, injected from .env — never hard-coded in the config files.
+      # Widget secrets, injected from .env: never hard-coded in the config files.
       HOMEPAGE_VAR_PIHOLE_PASSWORD: ${PIHOLE_PASSWORD:?set PIHOLE_PASSWORD in .env}
       HOMEPAGE_VAR_ABS_TOKEN: ${ABS_TOKEN:-}
     networks:
@@ -91,8 +91,8 @@ volumes:
   portainer_data:
 ```
 
-Create this project’s `.env` and `.gitignore` — the same pattern as
-every other stack:
+Create this project’s `.env` and `.gitignore`, the same pattern as every
+other stack:
 
 ``` bash
 cat > ~/dashboard/.env <<'EOF'
@@ -126,28 +126,28 @@ cd ~/dashboard && docker compose up -d
 >
 > ### Portainer’s 5-minute clock
 >
-> The first time you open Portainer (`https://homelab:9443` — accept the
+> The first time you open Portainer (`https://homelab:9443`, accept the
 > self-signed cert warning once), it asks you to create an admin user.
 > Do it **within a few minutes** of starting the container, or Portainer
 > locks itself and you must `docker restart portainer` to reopen the
 > window. The `:lts` image runs natively on a 64-bit Pi.
 
-## Step 2 — Configure the tiles
+## Step 2: Configure the tiles
 
 > [!IMPORTANT]
 >
 > ### Why your dashboard looks empty at first
 >
-> Homepage does **not** auto-discover anything — out of the box it
+> Homepage does **not** auto-discover anything, out of the box it
 > creates *blank* config files and shows a nearly empty page. Everything
 > you see is whatever you put in `./config/*.yaml`. The blocks below are
-> a deliberately *full* starting point — service tiles, a bookmarks row,
-> and an info bar — so the page looks alive immediately.
+> a deliberately *full* starting point (service tiles, a bookmarks row,
+> and an info bar) so the page looks alive immediately.
 
 Homepage reads YAML from the `./config` folder. Replace the
 auto-generated blank files with these.
 
-**`config/settings.yaml`** — look and section layout:
+**`config/settings.yaml`**, look and section layout:
 
 ``` yaml
 title: My Homelab
@@ -169,7 +169,7 @@ layout:
     columns: 4
 ```
 
-**`config/docker.yaml`** — lets tiles show live container status via the
+**`config/docker.yaml`**, lets tiles show live container status via the
 socket:
 
 ``` yaml
@@ -177,7 +177,7 @@ my-docker:
   socket: /var/run/docker.sock
 ```
 
-**`config/services.yaml`** — the tiles, now pointing at the pretty URLs
+**`config/services.yaml`**, the tiles, now pointing at the pretty URLs
 from Part 4:
 
 ``` yaml
@@ -191,7 +191,7 @@ from Part 4:
         widget:
           type: audiobookshelf
           url: http://audiobookshelf:80         # container name + internal port (for widget data)
-          key: '{{HOMEPAGE_VAR_ABS_TOKEN}}'     # injected from .env — no real token in this file
+          key: '{{HOMEPAGE_VAR_ABS_TOKEN}}'     # injected from .env, no real token in this file
 
 - Network:
     - Pi-hole:
@@ -204,7 +204,7 @@ from Part 4:
           type: pihole
           url: http://pihole:80                    # container name + internal port
           version: 6                               # REQUIRED for Pi-hole v6 (defaults to 5!)
-          key: '{{HOMEPAGE_VAR_PIHOLE_PASSWORD}}'  # injected from .env — no real password in this file
+          key: '{{HOMEPAGE_VAR_PIHOLE_PASSWORD}}'  # injected from .env, no real password in this file
 
 - Management:
     - Portainer:
@@ -213,7 +213,7 @@ from Part 4:
         description: Manage Docker containers
 ```
 
-**`config/widgets.yaml`** — the info bar across the top:
+**`config/widgets.yaml`**, the info bar across the top:
 
 ``` yaml
 - resources:
@@ -231,8 +231,8 @@ from Part 4:
     text: Welcome to the homelab
 ```
 
-**`config/bookmarks.yaml`** — a row of quick links (pure links, no
-Docker logic):
+**`config/bookmarks.yaml`**, a row of quick links (pure links, no Docker
+logic):
 
 ``` yaml
 - Links:
@@ -261,16 +261,16 @@ cd ~/dashboard && docker compose restart homepage
 > ### The Pi-hole v6 widget gotcha
 >
 > If the Pi-hole tile shows “API error,” the most common cause is a
-> missing `version: 6` line — the widget defaults to the old v5 API,
+> missing `version: 6` line, the widget defaults to the old v5 API,
 > which no longer exists. The `key` for v6 is your admin password, not a
 > legacy API token.
 
-## Step 3 — Give the dashboard its pretty URL
+## Step 3: Give the dashboard its pretty URL
 
 This is the Part 4 pattern, applied to the dashboard. Add a Caddy route
 and a Pi-hole record so `https://home.home` (and the alias
 `https://homelab`) open the dashboard. `tls internal` gives it the same
-trusted-cert treatment as Part 4’s names — no extra certificate work.
+trusted-cert treatment as Part 4’s names, no extra certificate work.
 
 **1. Add a block to `~/proxy/Caddyfile`:**
 
@@ -297,18 +297,18 @@ records you added in Part 4.
 > Caddy forwards `home.home` and `homelab` to it, so both must appear in
 > `HOMEPAGE_ALLOWED_HOSTS` (they do, in Step 1). If you add another name
 > later, add it there too and
-> `docker compose up -d --force-recreate homepage` — this variable only
+> `docker compose up -d --force-recreate homepage`. This variable only
 > takes effect on a recreate, not a plain restart.
 
-## Step 4 — Try it
+## Step 4: Try it
 
 From your laptop or phone, anywhere on the tailnet:
 
-    https://home.home      # (or https://homelab — both open the dashboard)
+    https://home.home      # (or https://homelab, both open the dashboard)
 
 You should see your dashboard with live tiles for Audiobookshelf and
 Pi-hole and a link into Portainer. From the Portainer tile you can
-start, stop, inspect, and update every container by clicking — including
+start, stop, inspect, and update every container by clicking, including
 pulling new images.
 
 ## Troubleshooting
@@ -330,7 +330,7 @@ in the widget `url`. For Pi-hole, confirm `version: 6` and the correct
 password.
 
 **Portainer won’t let me create an admin user.** The security timeout
-elapsed — `docker restart portainer` and reopen `https://homelab:9443`
+elapsed, `docker restart portainer` and reopen `https://homelab:9443`
 promptly.
 
 ## Recap
@@ -339,8 +339,8 @@ promptly.
   `homelab` network, deployed as one `~/dashboard` stack.
 - **Tiles** point at the pretty URLs from Part 4 and pull live status
   via the Docker socket and service APIs.
-- **Added the dashboard to the proxy** — one Caddy block + one Pi-hole
-  record — so `https://home.home` (and `https://homelab`) open it from
+- **Added the dashboard to the proxy**, one Caddy block + one Pi-hole
+  record, so `https://home.home` (and `https://homelab`) open it from
   anywhere.
 
 Your homelab now has a single, memorable front door. In [Part
