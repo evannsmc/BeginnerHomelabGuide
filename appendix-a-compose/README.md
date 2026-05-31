@@ -9,15 +9,15 @@ Compose file the series creates, so when you come back in six months you
 can read your own stack and know exactly what each line does (and what’s
 safe to change).
 
-By the end of the series your Pi runs five containers across three
-Compose projects plus one `docker run`:
+By the end of the series your Pi runs five containers across four
+Compose projects:
 
-| Project folder          | File           | Containers              |
-|-------------------------|----------------|-------------------------|
-| `~/pihole`              | `compose.yaml` | `pihole`                |
-| `~/proxy`               | `compose.yaml` | `caddy`                 |
-| `~/dashboard`           | `compose.yaml` | `homepage`, `portainer` |
-| *(none — `docker run`)* | —              | `audiobookshelf`        |
+| Project folder     | File           | Containers              |
+|--------------------|----------------|-------------------------|
+| `~/audiobookshelf` | `compose.yaml` | `audiobookshelf`        |
+| `~/pihole`         | `compose.yaml` | `pihole`                |
+| `~/proxy`          | `compose.yaml` | `caddy`                 |
+| `~/dashboard`      | `compose.yaml` | `homepage`, `portainer` |
 
 ## Compose concepts that show up everywhere
 
@@ -170,6 +170,8 @@ services:
     image: caddy:latest
     ports:
       - "80:80"
+      - "443:443"
+      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -187,16 +189,20 @@ volumes:
   caddy_config:
 ```
 
-- **`ports: 80:80`** — Caddy is the **single front door**. It owns the
-  host’s port 80 on all interfaces, which is why no other container may
-  publish port 80. Every `http://*.home` request lands here first.
+- **`ports: 80:80`, `443:443`, `443:443/udp`** — Caddy is the **single
+  front door**, so no other container may publish these. Port **80**
+  catches plain-HTTP requests and redirects them to HTTPS; port **443**
+  serves HTTPS (the `/udp` line enables HTTP/3). Every `*.home` request
+  lands here first.
 - **`volumes`**:
   - `./Caddyfile:/etc/caddy/Caddyfile:ro` — mounts your routing table
     into the container, **read-only** (Caddy never needs to write its
     own config).
   - `caddy_data` / `caddy_config` — named volumes for Caddy’s internal
-    state (most importantly any TLS certificates, if you later use a
-    real domain). Kept as named volumes because you never edit them by
+    state. Crucially, `caddy_data` holds the **internal certificate
+    authority** that `tls internal` creates (`/data/caddy/pki/...`) and
+    the certs it signs — so your trusted CA survives container
+    recreations. Kept as named volumes because you never edit them by
     hand.
 - **`networks: homelab`** — lets Caddy reach each backend by container
   name. This is the whole trick: Caddy connects to `pihole:80`,
@@ -207,37 +213,41 @@ volumes:
 The companion **`Caddyfile`** is the routing table:
 
 ``` default
-http://pihole.home {
+pihole.home {
+    tls internal
     redir / /admin 302
     reverse_proxy pihole:80
 }
 
-http://abs.home {
+abs.home {
+    tls internal
     reverse_proxy audiobookshelf:80
 }
 
-http://home.home, http://homelab {
+home.home, homelab {
+    tls internal
     reverse_proxy homepage:3000
 }
 ```
 
-- **`http://` prefix** — tells Caddy to serve plain HTTP and **not** try
-  to fetch a TLS certificate. There’s no public certificate authority
-  for a private `.home` name, so without this prefix Caddy would loop
-  trying (and failing) to get one. On your authenticated tailnet, plain
-  HTTP is fine.
 - **`{ ... }` site block** — one per hostname (or comma-separated list
-  of hostnames). Caddy matches the incoming request’s `Host` header to
-  the right block.
+  of hostnames). The address is a **bare name** (no
+  `http://`/`https://`); Caddy matches the incoming request’s `Host`
+  header to the right block.
+- **`tls internal`** — the key directive. There’s no public certificate
+  authority for a private `.home` name, so Caddy spins up its **own**
+  local CA, signs a cert for each name, and serves HTTPS. You trust that
+  CA once per device (Part 4 Step 7) and the URLs get a real padlock.
+  Caddy also auto-redirects `http://` to `https://` for these names.
 - **`reverse_proxy <name>:<port>`** — forwards the request to that
   container over the `homelab` network. The port is the service’s
   *internal* port, not its published host port.
 - **`redir / /admin 302`** — Pi-hole’s UI lives under `/admin`; this
-  sends a bare `http://pihole.home/` to `http://pihole.home/admin` so
+  sends a bare `https://pihole.home/` to `https://pihole.home/admin` so
   you land in the right place. The `302` is a temporary-redirect status
   code.
-- **`http://home.home, http://homelab`** — two names, one backend: both
-  open the dashboard.
+- **`home.home, homelab`** — two names, one backend: both open the
+  dashboard.
 
 ## `~/dashboard/compose.yaml` — Homepage + Portainer
 
@@ -334,47 +344,54 @@ This is the only project with **two** services. Note Homepage has **no
 > expose a container that mounts the socket to the public internet; on
 > your tailnet-only homelab it’s fine.
 
-## Audiobookshelf — the `docker run` hold-out
+## `~/audiobookshelf/compose.yaml` — Audiobookshelf
 
-Audiobookshelf is the one service launched with `docker run` instead of
-Compose, because [Part 2](../02-audiobookshelf/README.md) introduces it
-before any Compose project exists:
+The media server set up in [Part 2](../02-audiobookshelf/README.md). It’s the
+first stack you create, then [Part 4](../04-pretty-urls/README.md) adds the
+`networks` block so Caddy can reach it as `audiobookshelf:80`:
 
-``` bash
-docker run -d \
-  --name audiobookshelf \
-  --restart unless-stopped \
-  -p 13378:80 \
-  -v ~/Audiobooks:/audiobooks \
-  -v ~/Audiobooks-drill:/audiobooks-drill \
-  -v ~/.config/audiobookshelf/config:/config \
-  -v ~/.config/audiobookshelf/metadata:/metadata \
-  ghcr.io/advplyr/audiobookshelf:latest
+``` yaml
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
+
+    ports:
+      - "13378:80"
+
+    volumes:
+      - ${HOME}/Audiobooks:/audiobooks
+      - ${HOME}/Audiobooks-drill:/audiobooks-drill
+      - ./config:/config
+      - ./metadata:/metadata
+
+    networks:
+      - homelab
+
+    restart: unless-stopped
+
+networks:
+  homelab:
+    external: true
 ```
 
-The flags map one-to-one onto the Compose directives above:
-
-| `docker run` flag | Compose equivalent | Meaning |
-|----|----|----|
-| `-d` | *(default)* | Detached — run in the background. |
-| `--name audiobookshelf` | `container_name:` | Fixed name (so `abs.home` can proxy to it). |
-| `--restart unless-stopped` | `restart:` | Auto-start on boot and after crashes. |
-| `-p 13378:80` | `ports:` | Publish host 13378 → container 80. |
-| `-v host:container` | `volumes:` | Bind-mount audio folders, config, metadata. |
-
-> [!TIP]
->
-> ### Why this one isn’t on the `homelab` network in its run command
->
-> The `homelab` network doesn’t exist until [Part
-> 4](../04-pretty-urls/README.md), which is *after* Audiobookshelf is created
-> — so Part 4 attaches it with
-> `docker network connect homelab audiobookshelf`. Because it’s not a
-> Compose service, that imperative attachment sticks **until you
-> recreate the container** (e.g. the update procedure in Part 2’s
-> *Maintenance*). After any `docker rm`/re-`run`, re-attach it with
-> `docker network connect homelab audiobookshelf`, or `abs.home` will
-> stop resolving through Caddy. (If you prefer, you can convert
-> Audiobookshelf to its own `~/audiobookshelf/compose.yaml` using the
-> patterns above, with a `networks: [homelab]` block, to make it as
-> recreate-proof as the others.)
+- **`ports: 13378:80`** — Audiobookshelf listens on port 80 *inside* the
+  container; we publish it on the host as **13378** (host 80 is reserved
+  for Caddy). You still reach the app directly at `homelab:13378` — the
+  iPhone app uses that address — while the browser uses `abs.home`
+  through Caddy.
+- **`volumes`**:
+  - `${HOME}/Audiobooks:/audiobooks` and
+    `${HOME}/Audiobooks-drill:/audiobooks-drill` — your audio libraries.
+    `${HOME}` is expanded by Compose to your home directory (Compose
+    does **not** expand a bare `~`, so use `${HOME}`).
+  - `./config:/config` and `./metadata:/metadata` — Audiobookshelf’s
+    database (users, listening positions, settings) and cached cover
+    art, kept next to the compose file so recreating the container loses
+    nothing.
+- **`networks: homelab` + top-level `external: true`** — joins the
+  shared proxy network *declaratively*, exactly like Pi-hole. Added in
+  Part 4; before that the stack runs on its own default network.
+  Declaring it here (rather than a hand `docker network connect`) is
+  what makes the attachment survive every recreate — see the warning
+  under Pi-hole above.

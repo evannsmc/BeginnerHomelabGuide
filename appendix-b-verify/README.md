@@ -42,9 +42,9 @@ on, the `.home` names and tailnet-wide ad-blocking won’t work on your
 
 | Service | URL (everywhere on your tailnet) | What it does |
 |----|----|----|
-| **Dashboard** (Homepage) | `http://home.home` (or `http://homelab`) | Landing page; live tiles + links |
-| **Audiobookshelf** | `http://abs.home` | Stream your audiobooks / Assimil |
-| **Pi-hole** | `http://pihole.home` | DNS ad-blocking admin |
+| **Dashboard** (Homepage) | `https://home.home` (or `https://homelab`) | Landing page; live tiles + links |
+| **Audiobookshelf** | `https://abs.home` | Stream your audiobooks / Assimil |
+| **Pi-hole** | `https://pihole.home` | DNS ad-blocking admin |
 | **Portainer** | `https://homelab:9443` | Docker management GUI |
 
 All four work from any device signed into your tailnet — home Wi-Fi or
@@ -103,14 +103,14 @@ exactly as a remote device sees it.
 ping home.home          # answers from the Pi's 100.x.y.z
 ```
 
-Then open `http://home.home`, `http://abs.home`, and
-`http://pihole.home` in a browser. If `ping` fails here but step 4
+Then open `https://home.home`, `https://abs.home`, and
+`https://pihole.home` in a browser. If `ping` fails here but step 4
 passed on the Pi, the missing piece is the **Tailscale DNS override**
 (the cloud setting at the top of this appendix).
 
 **6. The dashboard widgets have live data:**
 
-Open `http://home.home`. The Pi-hole tile should show today’s
+Open `https://home.home`. The Pi-hole tile should show today’s
 blocked-query count and the Audiobookshelf tile your library — proof the
 widgets authenticated through the `homelab` network using the secrets in
 `~/dashboard/.env`. If a tile says “API error,” see the widget

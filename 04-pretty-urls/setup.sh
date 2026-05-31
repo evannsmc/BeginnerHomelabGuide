@@ -1,25 +1,45 @@
 #!/usr/bin/env bash
-# Part 4 — Pretty URLs: Caddy reverse proxy + Pi-hole local DNS. Run this ON the Pi.
+# Part 4 — Pretty URLs: Caddy reverse proxy (HTTPS) + Pi-hole local DNS. Run ON the Pi.
 #
-# Creates the shared 'homelab' network, widens Pi-hole onto the tailnet, deploys
-# Caddy as the single port-80 front door, and adds the .home DNS records. The
-# Caddyfile is pre-wired for the Part 5 dashboard (home.home) too, so you don't
-# have to edit it again. The Tailscale admin-console DNS push is manual (below).
+# Creates the shared 'homelab' network, attaches both Compose services
+# (audiobookshelf + pihole) to it declaratively, widens Pi-hole onto the tailnet,
+# deploys Caddy as the single front door with HTTPS via its own internal CA, adds
+# the .home DNS records, and exports Caddy's root cert for you to trust on your
+# devices. The Tailscale admin-console DNS push is manual (printed at the end).
 set -euo pipefail
 
 echo "==> Creating the shared 'homelab' Docker network"
 docker network create homelab 2>/dev/null && echo "    created" || echo "    already exists"
 
-# Audiobookshelf runs from 'docker run' (Part 2), so attach it imperatively.
-if docker ps -a --format '{{.Names}}' | grep -qx audiobookshelf; then
-  docker network connect homelab audiobookshelf 2>/dev/null || true
-  echo "    attached audiobookshelf to homelab"
-fi
+echo "==> Attaching Audiobookshelf to homelab (declaratively, via its compose.yaml)"
+cat > ~/audiobookshelf/compose.yaml <<'EOF'
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
+
+    ports:
+      - "13378:80"
+
+    volumes:
+      - ${HOME}/Audiobooks:/audiobooks
+      - ${HOME}/Audiobooks-drill:/audiobooks-drill
+      - ./config:/config
+      - ./metadata:/metadata
+
+    networks:
+      - homelab            # NEW: join the shared proxy network
+
+    restart: unless-stopped
+
+networks:
+  homelab:
+    external: true         # NEW: the shared network created above
+EOF
+( cd ~/audiobookshelf && docker compose up -d --force-recreate )
 
 echo "==> Rewriting ~/pihole/compose.yaml: all-interfaces + 8081 web + homelab network"
-# Pi-hole joins 'homelab' DECLARATIVELY so a --force-recreate always re-attaches
-# it (a hand 'docker network connect' would be wiped by the recreate).
-cat > ~/pihole/compose.yaml <<'YAML'
+cat > ~/pihole/compose.yaml <<'EOF'
 services:
   pihole:
     container_name: pihole
@@ -47,25 +67,29 @@ services:
 networks:
   homelab:
     external: true
-YAML
+EOF
 ( cd ~/pihole && docker compose up -d --force-recreate )
 
-echo "==> Deploying Caddy (~/proxy)"
+echo "==> Deploying Caddy (~/proxy) with HTTPS via its internal CA"
 mkdir -p ~/proxy
 cat > ~/proxy/Caddyfile <<'CADDY'
-# http:// = plain HTTP, no TLS cert fetch (there's no public CA for a .home name).
-http://pihole.home {
+# `tls internal` = Caddy issues each .home name a cert from its OWN local CA
+# (no public CA issues certs for a private TLD). Trust that CA on your devices
+# (printed below) and bare names like home.home open over HTTPS, no warning.
+pihole.home {
+	tls internal
 	redir / /admin 302
 	reverse_proxy pihole:80
 }
 
-http://abs.home {
+abs.home {
+	tls internal
 	reverse_proxy audiobookshelf:80
 }
 
-# Pre-wired for Part 5's dashboard (homepage). Until Part 5 runs, this route
-# simply has no backend yet — harmless.
-http://home.home, http://homelab {
+# Pre-wired for Part 5's dashboard (homepage); harmless until Part 5 runs.
+home.home, homelab {
+	tls internal
 	reverse_proxy homepage:3000
 }
 CADDY
@@ -77,6 +101,8 @@ services:
     image: caddy:latest
     ports:
       - "80:80"
+      - "443:443"
+      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -94,6 +120,7 @@ volumes:
   caddy_config:
 YAML
 ( cd ~/proxy && docker compose up -d )
+sleep 4
 
 echo "==> Adding Pi-hole local DNS records -> the Pi's Tailscale IP"
 TSIP=$(tailscale ip -4 | head -1)
@@ -101,13 +128,25 @@ docker exec pihole pihole-FTL --config dns.hosts \
   "[ \"$TSIP pihole.home\", \"$TSIP abs.home\", \"$TSIP home.home\" ]"
 echo "    pihole.home / abs.home / home.home -> $TSIP"
 
+echo "==> Exporting Caddy's root CA to ~/proxy/caddy-root-ca.crt (trust it on your devices)"
+docker exec caddy cat /data/caddy/pki/authorities/local/root.crt > ~/proxy/caddy-root-ca.crt 2>/dev/null \
+  && echo "    wrote ~/proxy/caddy-root-ca.crt" || echo "    (CA not ready yet; re-run this line shortly)"
+
 cat <<NOTE
 
-================================ MANUAL STEP ================================
-Make Pi-hole your tailnet's DNS (Tailscale admin console -> DNS page):
-  1. Add nameserver -> Custom: enter  $TSIP
-       Restrict to domain: OFF      Use with exit node: OFF
-  2. Turn ON "Override local DNS".
-Then from any device on the tailnet:  ping home.home   (should answer from $TSIP)
+================================ MANUAL STEPS ================================
+1. Make Pi-hole your tailnet's DNS (Tailscale admin console -> DNS page):
+     - Add nameserver -> Custom: enter  $TSIP
+         Restrict to domain: OFF      Use with exit node: OFF
+     - Turn ON "Override local DNS".
+   Then from any device:  ping home.home   (should answer from $TSIP)
+
+2. Trust Caddy's root CA so bare names open with a padlock (copy the file off
+   first, e.g.  scp you@homelab:~/proxy/caddy-root-ca.crt . ):
+     - Linux:  sudo cp caddy-root-ca.crt /usr/local/share/ca-certificates/ \
+               && sudo update-ca-certificates
+               (Firefox: Settings -> Certificates -> Authorities -> Import)
+     - iPhone: AirDrop/email the .crt -> install profile -> Settings -> General
+               -> About -> Certificate Trust Settings -> Enable Full Trust.
 ============================================================================
 NOTE

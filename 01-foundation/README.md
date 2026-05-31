@@ -43,7 +43,9 @@ corporate Wi-Fi.
 - A **Raspberry Pi 4 or 5** with 4 GB+ RAM, a power supply, and a
   microSD card (16 GB+). The Pi will be your always-on server. *This
   guide was built on a **Raspberry Pi 4 Model B (8 GB)** with a **32 GB
-  microSD card** — comfortable headroom, but not a minimum.*
+  microSD card**, in an **Argon ONE M.2 Aluminum case**, running
+  **Ubuntu Server 26.04 LTS (64-bit), headless** — comfortable headroom,
+  but not a minimum. Raspberry Pi OS Lite works identically.*
 - A **laptop/desktop** (Linux assumed; the commands use `apt`/`systemd`)
   to flash the card and to use as a client.
 - An **iPhone** (the apps used later also exist for Android; commands
@@ -52,11 +54,14 @@ corporate Wi-Fi.
   email at <https://tailscale.com>. One account, signed into on every
   device, is the only “server” you need.
 
-## Step 1 — Flash Raspberry Pi OS Lite with key-based SSH
+## Step 1 — Flash a headless 64-bit Linux with key-based SSH
 
-Install **Raspberry Pi Imager** on your laptop, then choose **Raspberry
-Pi OS Lite (64-bit)** — no desktop, just SSH and a shell, which is all a
-headless server needs.
+Install **Raspberry Pi Imager** on your laptop. This guide’s reference
+build runs **Ubuntu Server 26.04 LTS (64-bit)** — in Imager, choose
+**Other general-purpose OS → Ubuntu → Ubuntu Server 26.04 LTS
+(64-bit)**. (**Raspberry Pi OS Lite (64-bit)** works exactly the same
+way and the rest of the guide is identical — pick either; both are
+headless, just SSH and a shell, which is all a server needs.)
 
 Before writing the card, open Imager’s settings (the gear / **Edit
 settings**):
@@ -201,8 +206,8 @@ online, the foundation is done.
 
 ## Recap
 
-- **Flashed** Raspberry Pi OS Lite with key-only SSH (no passwords, no
-  open ports).
+- **Flashed** a headless 64-bit Linux (Ubuntu Server 26.04 LTS) with
+  key-only SSH (no passwords, no open ports).
 - **Installed Docker** on the Pi — the runtime for every later service.
 - **Built your tailnet:** the Pi, your laptop, and your iPhone all on
   one private WireGuard mesh, signed into one account.

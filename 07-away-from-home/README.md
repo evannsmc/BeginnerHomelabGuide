@@ -19,9 +19,10 @@ This one already works, and it’s the cleanest win. Because Tailscale is
 a mesh VPN, any device signed into your tailnet reaches the Pi from
 anywhere — coffee shop, cellular, hotel — with no extra setup:
 
-- **Audiobookshelf:** `http://abs.home` streams just as it does at home.
-- **The dashboard:** `http://home.home` (or `http://homelab`) opens from
-  anywhere.
+- **Audiobookshelf:** `https://abs.home` streams just as it does at
+  home.
+- **The dashboard:** `https://home.home` (or `https://homelab`) opens
+  from anywhere.
 
 The reason it’s effortless is that you’re only reaching *into* your own
 network over an authenticated tunnel. The hard parts below are all about
@@ -62,8 +63,8 @@ Two consequences fall out of it:
 1.  **Aura and Tailscale can’t both be on (on a phone).** iOS and
     Android allow exactly one active VPN. Turn on Aura to change
     location, and Tailscale drops — which means your
-    Pi-hole-over-Tailscale push and your `http://homelab` access both go
-    dark, because the Pi’s `100.x` address is only reachable over
+    Pi-hole-over-Tailscale push and your `https://homelab` access both
+    go dark, because the Pi’s `100.x` address is only reachable over
     Tailscale.
 2.  **Whatever VPN is active forces its own DNS.** Even setting the
     one-VPN limit aside, the active VPN routes DNS through its own
@@ -161,7 +162,7 @@ For most people the comfortable default is simple:
 ## Recap — and the whole series in one breath
 
 - **Reaching your homelab away** is the free win: Tailscale makes
-  `homelab:13378` and `http://homelab` work from anywhere, no extra
+  `homelab:13378` and `https://home.home` work from anywhere, no extra
   setup.
 - **Pi-hole on the road** takes one change — add the Pi as a custom
   nameserver in the Tailscale admin console and turn on **Override local
@@ -176,7 +177,7 @@ For most people the comfortable default is simple:
 
 With that, your homelab is fully mobile: an always-on Raspberry Pi that
 streams your media, blocks ads on every device, presents a single
-`http://home.home` control panel, and — when you understand the one-VPN
+`https://home.home` control panel, and — when you understand the one-VPN
 rule — gives you a deliberate, switchable answer for privacy and
 ad-blocking the moment you step out the door. All of it private by
 default, over one Tailscale network, with nothing exposed to the public

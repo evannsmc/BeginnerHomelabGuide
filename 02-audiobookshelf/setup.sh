@@ -1,37 +1,48 @@
 #!/usr/bin/env bash
-# Part 2 — Audiobookshelf media server. Run this ON the Pi (Docker from Part 1).
+# Part 2 — Audiobookshelf media server (Docker Compose). Run this ON the Pi.
 #
-# It creates the storage folders and launches the container. Ripping a disc and
-# copying audio to ~/Audiobooks is done from your laptop (see this section's
-# README, Steps 3-4) — the server happily serves an empty folder until then.
+# Creates a self-contained ~/audiobookshelf Compose project and launches it.
+# Ripping a disc and copying audio to ~/Audiobooks is done from your laptop (see
+# this section's README, Steps 3-4) — the server happily serves an empty folder
+# until then.
 set -euo pipefail
 
-echo "==> Creating audio + config folders"
+echo "==> Creating audio + project folders"
 mkdir -p ~/Audiobooks ~/Audiobooks-drill
-mkdir -p ~/.config/audiobookshelf/config ~/.config/audiobookshelf/metadata
+mkdir -p ~/audiobookshelf/config ~/audiobookshelf/metadata
+cd ~/audiobookshelf
 
+# If an old (pre-Compose) container is hanging around, drop it — data lives in
+# the bind mounts below, so nothing is lost.
 if docker ps -a --format '{{.Names}}' | grep -qx audiobookshelf; then
-  echo "==> Existing audiobookshelf container found — recreating"
-  docker rm -f audiobookshelf
+  if [ -z "$(docker inspect audiobookshelf --format '{{index .Config.Labels "com.docker.compose.project"}}')" ]; then
+    echo "==> Removing a non-Compose 'audiobookshelf' container"
+    docker rm -f audiobookshelf
+  fi
 fi
 
-echo "==> Starting Audiobookshelf on host port 13378"
-docker run -d \
-  --name audiobookshelf \
-  --restart unless-stopped \
-  -p 13378:80 \
-  -v ~/Audiobooks:/audiobooks \
-  -v ~/Audiobooks-drill:/audiobooks-drill \
-  -v ~/.config/audiobookshelf/config:/config \
-  -v ~/.config/audiobookshelf/metadata:/metadata \
-  ghcr.io/advplyr/audiobookshelf:latest
+echo "==> Writing ~/audiobookshelf/compose.yaml"
+cat > compose.yaml <<'EOF'
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
 
-# If the shared proxy network already exists (Part 4 done), re-attach so the
-# pretty URL http://abs.home keeps working after this recreate.
-if docker network inspect homelab >/dev/null 2>&1; then
-  docker network connect homelab audiobookshelf 2>/dev/null || true
-  echo "==> Re-attached to the 'homelab' network"
-fi
+    ports:
+      - "13378:80"          # host 13378 -> container 80 (host 80 stays free for Caddy)
+
+    volumes:
+      - ${HOME}/Audiobooks:/audiobooks
+      - ${HOME}/Audiobooks-drill:/audiobooks-drill
+      - ./config:/config
+      - ./metadata:/metadata
+
+    restart: unless-stopped
+EOF
+printf 'config/\nmetadata/\n' > .gitignore
+
+echo "==> Starting Audiobookshelf"
+docker compose up -d
 
 echo
 echo "==> Up. Open http://homelab:13378 (or http://<pi-ip>:13378) to:"

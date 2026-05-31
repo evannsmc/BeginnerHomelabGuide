@@ -38,7 +38,9 @@ cat <<'NOTE'
 These can't be scripted:
 
 1. Flash the SD card with Raspberry Pi Imager:
-     - OS:  "Raspberry Pi OS Lite (64-bit)"
+     - OS:  "Ubuntu Server 26.04 LTS (64-bit)" (Other general-purpose OS ->
+            Ubuntu) — the reference build. "Raspberry Pi OS Lite (64-bit)" works
+            identically; pick either, both are headless.
      - Settings (gear): set hostname "homelab" + your username; under Services
        enable SSH -> "Allow public-key authentication only" and paste your
        laptop's ~/.ssh/id_ed25519.pub  (generate with: ssh-keygen -t ed25519)

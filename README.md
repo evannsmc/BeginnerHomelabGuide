@@ -20,13 +20,16 @@ in a copy-friendly code block.
 >   that's all, *so far*.
 > - **Case:** an **Argon ONE M.2 Aluminum** case (keeps it cool and tidy; the
 >   M.2 slot is there for a future SSD upgrade — not used yet).
+> - **OS:** **Ubuntu Server 26.04 LTS (64-bit), headless** (no desktop, SSH only).
+>   Raspberry Pi OS Lite works identically — every command is the same.
 > - It's a learning project, not a 99.99%-uptime production setup. It's perfect
 >   for getting comfortable with Docker, DNS, and self-hosting.
 
 ## 🚀 Quick start
 
-On a Pi you've already flashed with Raspberry Pi OS Lite (see
-[Part 1](01-foundation/README.md)) and signed into Tailscale:
+On a Pi you've already flashed with a headless 64-bit Linux — Ubuntu Server
+26.04 LTS or Raspberry Pi OS Lite (see [Part 1](01-foundation/README.md)) — and
+signed into Tailscale:
 
 ```bash
 git clone https://github.com/evannsmc/BeginnerHomelabGuide.git

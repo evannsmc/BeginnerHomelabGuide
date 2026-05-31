@@ -415,5 +415,5 @@ the router points back at Pi-hole (that’s a resolution loop).
 Your homelab now does two jobs on your home network. In [Part
 4](../04-pretty-urls/README.md) we stop typing IP addresses and ports to
 reach these services — a small reverse proxy plus local DNS gives
-Pi-hole and Audiobookshelf clean names like **`http://pihole.home`** and
-**`http://abs.home`** that work from anywhere on your tailnet.
+Pi-hole and Audiobookshelf clean names like **`https://pihole.home`**
+and **`https://abs.home`** that work from anywhere on your tailnet.

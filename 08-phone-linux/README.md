@@ -167,17 +167,17 @@ sidesteps discovery entirely:
 > This is the same trick that powered the whole series: discovery and
 > “same network” assumptions break the instant you leave home, and
 > Tailscale’s stable addresses are the fix. Just as you reached
-> Audiobookshelf and `http://homelab` by tailnet IP, you reach your
+> Audiobookshelf and `https://home.home` by tailnet IP, you reach your
 > *laptop* by tailnet IP here. The phone↔Linux conveniences stop being a
 > home-only luxury.
 
 ## Phone ↔ the headless Pi
 
 A caveat worth stating plainly: LocalSend and KDE Connect are
-**desktop** tools. Your Pi from Parts 1–5 runs Raspberry Pi OS **Lite**
-— no graphical desktop — so neither app is the natural fit there. For
-moving a file between your phone and the Pi, you already have better,
-GUI-free paths:
+**desktop** tools. Your Pi from Parts 1–5 runs a **headless** server OS
+(Ubuntu Server 26.04 LTS) — no graphical desktop — so neither app is the
+natural fit there. For moving a file between your phone and the Pi, you
+already have better, GUI-free paths:
 
 - **Drop it into a service you already run.** Files you want *on* the Pi
   (more audiobooks, say) can go straight into `~/Audiobooks` — `scp`
@@ -280,7 +280,7 @@ That completes *Beginner Homelab on a Raspberry Pi*. You started by
 building a foundation — a hardened, always-on Pi on a private Tailscale
 network — and then gave it job after job: streaming your media, blocking
 ads on every device, clean `http://*.home` URLs behind a reverse proxy,
-a single `http://home.home` control panel, a deliberate answer for VPN
+a single `https://home.home` control panel, a deliberate answer for VPN
 privacy on the road, and now two-way file sharing with your phone. Every
 piece runs on hardware you own, over one private network, with nothing
 exposed to the public internet.

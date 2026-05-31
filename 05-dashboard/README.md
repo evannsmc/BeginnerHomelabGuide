@@ -1,14 +1,14 @@
 
 
-# Part 5 — A one-URL dashboard at `http://home.home`
+# Part 5 — A one-URL dashboard at `https://home.home`
 
 > **The payoff of this part:** open any browser on your tailnet, type
-> **`http://home.home`**, and land on a clean dashboard that shows your
+> **`https://home.home`**, and land on a clean dashboard that shows your
 > services at a glance and links into a full Docker management console —
 > the single front door that ties everything together.
 
-Part 4 gave individual services clean names (`http://pihole.home`,
-`http://abs.home`). This part adds the *landing page* that gathers them
+Part 4 gave individual services clean names (`https://pihole.home`,
+`https://abs.home`). This part adds the *landing page* that gathers them
 in one place, plus a real management GUI — and it slots into the reverse
 proxy you built in Part 4 using the exact three-step pattern from the
 end of that chapter.
@@ -179,7 +179,7 @@ from Part 4:
 - Media:
     - Audiobookshelf:
         icon: audiobookshelf.png
-        href: http://abs.home                  # the pretty URL from Part 4
+        href: https://abs.home                  # the pretty URL from Part 4
         description: Audiobooks & language courses
         server: my-docker
         container: audiobookshelf              # -> live status dot + CPU/RAM
@@ -191,7 +191,7 @@ from Part 4:
 - Network:
     - Pi-hole:
         icon: pi-hole.png
-        href: http://pihole.home               # the pretty URL from Part 4
+        href: https://pihole.home               # the pretty URL from Part 4
         description: DNS ad-blocking
         server: my-docker
         container: pihole
@@ -263,12 +263,14 @@ cd ~/dashboard && docker compose restart homepage
 ## Step 3 — Give the dashboard its pretty URL
 
 This is the Part 4 pattern, applied to the dashboard. Add a Caddy route
-and a Pi-hole record so `http://home.home` (and the old
-`http://homelab`) open the dashboard.
+and a Pi-hole record so `https://home.home` (and the alias
+`https://homelab`) open the dashboard. `tls internal` gives it the same
+trusted-cert treatment as Part 4’s names — no extra certificate work.
 
 **1. Add a block to `~/proxy/Caddyfile`:**
 
-    http://home.home, http://homelab {
+    home.home, homelab {
+        tls internal
         reverse_proxy homepage:3000
     }
 
@@ -297,7 +299,7 @@ records you added in Part 4.
 
 From your laptop or phone, anywhere on the tailnet:
 
-    http://home.home      # (or http://homelab — both open the dashboard)
+    https://home.home      # (or https://homelab — both open the dashboard)
 
 You should see your dashboard with live tiles for Audiobookshelf and
 Pi-hole and a link into Portainer. From the Portainer tile you can
@@ -306,11 +308,11 @@ pulling new images.
 
 ## Troubleshooting
 
-**`http://home.home` shows a blank page.** `HOMEPAGE_ALLOWED_HOSTS`
+**`https://home.home` shows a blank page.** `HOMEPAGE_ALLOWED_HOSTS`
 doesn’t include the host you typed. Add it and
 `docker compose up -d --force-recreate homepage`.
 
-**`http://home.home` times out / “can’t connect.”** Either the name
+**`https://home.home` times out / “can’t connect.”** Either the name
 isn’t resolving (check the Pi-hole record from Step 3; try
 `ping home.home`) or Caddy isn’t routing it (confirm the block is in the
 `Caddyfile` and you restarted Caddy). `docker logs caddy` shows routing
@@ -333,7 +335,7 @@ promptly.
 - **Tiles** point at the pretty URLs from Part 4 and pull live status
   via the Docker socket and service APIs.
 - **Added the dashboard to the proxy** — one Caddy block + one Pi-hole
-  record — so `http://home.home` (and `http://homelab`) open it from
+  record — so `https://home.home` (and `https://homelab`) open it from
   anywhere.
 
 Your homelab now has a single, memorable front door. In [Part

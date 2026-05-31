@@ -178,40 +178,58 @@ disc’s read-only modes; let the Pi’s umask decide.
 ## Step 5 — Run Audiobookshelf on the Pi
 
 SSH into the Pi (`ssh you@homelab`). Docker is already installed from
-Part 1. Create persistent storage for the server’s config and metadata,
-then launch:
+Part 1. We’ll run Audiobookshelf as a small **Docker Compose** project —
+one folder with one `compose.yaml` — the same self-contained pattern
+every other service in this series uses (so it’s one lifecycle to learn
+and a single file to back up).
 
 ``` bash
-mkdir -p ~/.config/audiobookshelf/{config,metadata}
+mkdir -p ~/audiobookshelf/config ~/audiobookshelf/metadata
+cd ~/audiobookshelf
 
-docker run -d \
-  --name audiobookshelf \
-  --restart unless-stopped \
-  -p 13378:80 \
-  -v ~/Audiobooks:/audiobooks \
-  -v ~/Audiobooks-drill:/audiobooks-drill \
-  -v ~/.config/audiobookshelf/config:/config \
-  -v ~/.config/audiobookshelf/metadata:/metadata \
-  ghcr.io/advplyr/audiobookshelf:latest
+cat > compose.yaml <<'EOF'
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
+
+    ports:
+      - "13378:80"          # host 13378 -> container 80 (host 80 stays free for Caddy)
+
+    volumes:
+      - ${HOME}/Audiobooks:/audiobooks
+      - ${HOME}/Audiobooks-drill:/audiobooks-drill
+      - ./config:/config
+      - ./metadata:/metadata
+
+    restart: unless-stopped
+EOF
 ```
 
 (If you only ripped the monolithic version, drop the
-`-v ~/Audiobooks-drill:/audiobooks-drill` line.)
+`${HOME}/Audiobooks-drill` line.) Then keep the runtime data out of
+version control and launch:
 
-What the key flags do:
+``` bash
+printf 'config/\nmetadata/\n' > .gitignore
+docker compose up -d
+```
 
-- `--restart unless-stopped` auto-starts the container on boot and after
+What the key settings do:
+
+- `restart: unless-stopped` auto-starts the container on boot and after
   crashes — exactly what you want on an always-on Pi.
-- `-p 13378:80` maps host port 13378 to the container’s port 80 (we
-  avoid host port 80 to leave it free for later parts).
-- The `-v` mounts expose your audio folders to the container and persist
-  the database (listening positions, users, settings) across container
-  recreations.
+- `ports: 13378:80` maps host port 13378 to the container’s port 80 (we
+  avoid host port 80 to leave it free for the reverse proxy in Part 4).
+- The `volumes` expose your audio folders to the container and persist
+  the database (listening positions, users, settings) next to the
+  compose file, so recreating the container loses nothing. `${HOME}` is
+  expanded by Compose to your home directory.
 
 Verify it’s running:
 
 ``` bash
-docker ps --filter name=audiobookshelf
+docker compose ps
 curl -I http://localhost:13378        # expect HTTP/1.1 200 OK
 ```
 
@@ -297,18 +315,17 @@ If it does, the server is fully functional.
 **Update Audiobookshelf** (on the Pi):
 
 ``` bash
-docker pull ghcr.io/advplyr/audiobookshelf:latest
-docker rm -f audiobookshelf
-# then re-run the docker run command from Step 5
+cd ~/audiobookshelf
+docker compose pull && docker compose up -d
 ```
 
-Because config and metadata live in `~/.config/audiobookshelf/`,
-recreating the container preserves everything.
+Because config and metadata live in `~/audiobookshelf/`, recreating the
+container preserves everything.
 
 **Back up listening progress** with a cron job on the Pi:
 
 ``` bash
-0 3 * * * tar czf ~/backups/abs-$(date +\%F).tar.gz ~/.config/audiobookshelf
+0 3 * * * tar czf ~/backups/abs-$(date +\%F).tar.gz ~/audiobookshelf/config ~/audiobookshelf/metadata
 ```
 
 **Add more material:** drop another folder under `~/Audiobooks/` (e.g. a
@@ -327,10 +344,10 @@ Rename so they sort correctly (`Lesson 01.mp3`, not `Lesson 1.mp3`),
 then “Re-scan” in the web UI.
 
 **Container won’t restart after a reboot.**
-`docker ps -a --filter name=audiobookshelf`; if stopped,
-`docker start audiobookshelf`. If `--restart unless-stopped` isn’t
-taking effect, check `systemctl status docker` — Docker itself may not
-be enabled at boot.
+`cd ~/audiobookshelf && docker compose ps`; if it’s down,
+`docker compose up -d`. If `restart: unless-stopped` isn’t taking
+effect, check `systemctl status docker` — Docker itself may not be
+enabled at boot.
 
 **`rsync` reports “Permission denied” on every `mkdir`.** Check the
 destination mode: `ls -ld /path`. A `dr-x------` directory is missing
@@ -344,7 +361,7 @@ iPhone before leaving home — cached audio plays fully offline.
 
 - **Ripped** the disc on your laptop with `rsync --no-perms`.
 - **Copied** the audio to the Pi over the tailnet.
-- **Ran** Audiobookshelf on the Pi with one `docker run`.
+- **Ran** Audiobookshelf on the Pi as a small `docker compose` project.
 - **Connected** the iPhone app to `http://homelab:13378`.
 
 Your Assimil course is now permanently available from any device on your
