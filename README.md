@@ -100,6 +100,11 @@ The guide is two **volumes** of short chapters. Each chapter is grouped into
 |---|---|---|
 | 7 | [07-vpn](07-vpn/README.md) | VPN privacy: Aura vs Mullvad vs Tailscale exit nodes |
 | 8 | [08-away-from-home](08-away-from-home/README.md) | What works on the road, and the one-VPN rule |
+
+**Volume III, extras**
+
+| Ch | Folder | What you build |
+|---|---|---|
 | 9 | [09-phone-linux](09-phone-linux/README.md) | File + clipboard sharing between your phone and Linux |
 
 **Bonus reference:**

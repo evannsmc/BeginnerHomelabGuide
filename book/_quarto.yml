@@ -23,6 +23,8 @@ book:
       chapters:
         - chapter-7-vpn.qmd
         - chapter-8-away-from-home.qmd
+    - part: "Volume III: Extras"
+      chapters:
         - chapter-9-phone-linux.qmd
   appendices:
     - appendix-a-compose-explained.qmd

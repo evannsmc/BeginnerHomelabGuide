@@ -39,6 +39,9 @@ the public internet.
 8. **[On the road: homelab, Pi-hole, and VPN away from home](chapter-8-away-from-home.qmd).**
    The field manual for leaving the house, and the one rule for why homelab
    access, Pi-hole, and a privacy VPN can't all run at once.
+
+## Volume III: Extras
+
 9. **[Wiring your phone into your Linux machines](chapter-9-phone-linux.qmd).**
    LocalSend and KDE Connect for file transfer and clipboard sharing over
    Tailscale, plus the USB fallback for bulk photo offload.
