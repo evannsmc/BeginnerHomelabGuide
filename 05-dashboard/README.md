@@ -276,7 +276,7 @@ route and a Pi-hole record so `https://home.home` (and the alias
 `https://homelab`) open the dashboard. `tls internal` gives it the same
 trusted-cert treatment as Chapter 4’s names, no extra certificate work.
 
-**1. Add a block to `~/proxy/Caddyfile`:**
+**1. Add a block to `~/caddy/Caddyfile`:**
 
     home.home, homelab {
         tls internal
@@ -286,7 +286,7 @@ trusted-cert treatment as Chapter 4’s names, no extra certificate work.
 **2. Reload Caddy:**
 
 ``` bash
-cd ~/proxy && docker compose restart caddy
+cd ~/caddy && docker compose restart caddy
 ```
 
 **3. Add a Pi-hole Local DNS record** (Settings → Local DNS Records):
@@ -343,11 +343,11 @@ promptly.
   `homelab` network, deployed as one `~/dashboard` stack.
 - **Tiles** point at the pretty URLs from Chapter 4 and pull live status
   via the Docker socket and service APIs.
-- **Added the dashboard to the proxy**, one Caddy block + one Pi-hole
+- **Added the dashboard to Caddy**, one Caddy block + one Pi-hole
   record, so `https://home.home` (and `https://homelab`) open it from
   anywhere.
 
 Your homelab now has a single, memorable front door. In [Chapter
-7](../07-vpn/README.md) we turn to privacy on the *outbound* side: what a
+6](../06-vpn/README.md) we turn to privacy on the *outbound* side: what a
 VPN does, how Aura and Mullvad compare, and what a Tailscale *exit node*
 is.

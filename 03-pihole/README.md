@@ -222,8 +222,8 @@ docker compose logs --tail 20      # watch it come up
 > it. In [Chapter 4](../04-pretty-urls/README.md) we add a reverse proxy
 > that has to **own** port 80, because that’s the port a browser
 > connects to when you type a bare name like `pihole.home` with no
-> `:port`. Only one program can hold a host port, so the front door (the
-> proxy) gets 80 and Pi-hole’s web UI moves to **8081** then. You’ll
+> `:port`. Only one program can hold a host port, so the front door
+> (Caddy) gets 80 and Pi-hole’s web UI moves to **8081** then. You’ll
 > barely notice the number, since you’ll reach it as `pihole.home`
 > anyway. Why 8081 and not 8080? Counter-intuitively, **8080 is the most
 > common alternate HTTP port** (dev servers, lots of containers grab

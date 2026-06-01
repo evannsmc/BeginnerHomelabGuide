@@ -16,7 +16,7 @@ Compose projects:
 |--------------------|----------------|-------------------------|
 | `~/audiobookshelf` | `compose.yaml` | `audiobookshelf`        |
 | `~/pihole`         | `compose.yaml` | `pihole`                |
-| `~/proxy`          | `compose.yaml` | `caddy`                 |
+| `~/caddy`          | `compose.yaml` | `caddy`                 |
 | `~/dashboard`      | `compose.yaml` | `homepage`, `portainer` |
 
 ## Compose concepts that show up everywhere
@@ -129,9 +129,9 @@ networks:
 - **`ports: 53:53/tcp` and `53:53/udp`**, DNS uses **both** transports
   (UDP for almost everything, TCP for large responses), so both are
   published. They’re bound to all interfaces so the Pi answers DNS for
-  your LAN *and* over the tailnet. (In Chapter 3, before the proxy
-  existed, these were bound to the Pi’s LAN IP only,
-  `${PIHOLE_IP}:53:53`; Chapter 4 widens them.)
+  your LAN *and* over the tailnet. (In Chapter 3, before Caddy existed,
+  these were bound to the Pi’s LAN IP only, `${PIHOLE_IP}:53:53`;
+  Chapter 4 widens them.)
 - **`ports: 8081:80/tcp`**, Pi-hole’s web UI listens on port 80 *inside*
   the container; we publish it on the host as **8081** so the host’s
   port 80 stays free for Caddy.
@@ -156,12 +156,12 @@ networks:
   a folder next to the compose file, so recreating the container loses
   nothing.
 - **`networks: homelab` + top-level `external: true`**, joins the shared
-  proxy network *declaratively*. This is deliberate: attaching it by
+  homelab network *declaratively*. This is deliberate: attaching it by
   hand with `docker network connect` would be wiped by the next
   `--force-recreate` (see the warning in [Chapter
   4](../04-pretty-urls/README.md)). In the file, it always re-attaches.
 
-## `~/proxy/compose.yaml` + `Caddyfile`: the reverse proxy
+## `~/caddy/compose.yaml` + `Caddyfile`: the reverse proxy
 
 ``` yaml
 services:
@@ -393,8 +393,8 @@ under `media/`. All the volume paths are relative to that folder.
     art, kept next to the compose file so recreating the container loses
     nothing.
 - **`networks: homelab` + top-level `external: true`**, joins the shared
-  proxy network *declaratively*, exactly like Pi-hole. Added in Chapter
-  4; before that the stack runs on its own default network. Declaring it
-  here (rather than a hand `docker network connect`) is what makes the
-  attachment survive every recreate, see the warning under Pi-hole
-  above.
+  homelab network *declaratively*, exactly like Pi-hole. Added in
+  Chapter 4; before that the stack runs on its own default network.
+  Declaring it here (rather than a hand `docker network connect`) is
+  what makes the attachment survive every recreate, see the warning
+  under Pi-hole above.

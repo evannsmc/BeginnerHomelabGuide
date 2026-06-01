@@ -4,7 +4,7 @@
 > for the full picture.
 
 
-# Chapter 8. On the road: your homelab, Pi-hole, and VPN away from home
+# Chapter 7. On the road: your homelab, Pi-hole, and VPN away from home
 
 > **The payoff of this chapter:** a clear, honest map of what you can
 > and can’t have when you leave the house, reaching your homelab
@@ -95,8 +95,8 @@ modes in seconds. Pick per situation:
 | You’re away and you want… | Set this | Pi-hole? | Homelab? | Hides IP? |
 |----|----|----|----|----|
 | **Homelab + ad-blocking** (the everyday default) | Tailscale on, no exit node | ✅ via DNS push | ✅ | ❌ (your real IP) |
-| **Appear at home / reach LAN** | Tailscale + **Pi as exit node** (Chapter 7 C) | ✅ | ✅ | ❌ (home IP) |
-| **Privacy / change location** | **Mullvad exit node** (Chapter 7 A) | ❌ Mullvad’s DNS | ✅ (LAN access on) | ✅ |
+| **Appear at home / reach LAN** | Tailscale + **Pi as exit node** (Chapter 6 C) | ✅ | ✅ | ❌ (home IP) |
+| **Privacy / change location** | **Mullvad exit node** (Chapter 6 A) | ❌ Mullvad’s DNS | ✅ (LAN access on) | ✅ |
 | **Privacy via your existing app** | **Aura** on | ❌ Aura’s DNS | ❌ (Tailscale off) | ✅ |
 
 The pattern to read out of that table:
@@ -117,7 +117,7 @@ The pattern to read out of that table:
 
 ## Making a Mullvad exit node behave on the road
 
-If you go with the Mullvad add-on (Chapter 7’s recommendation), two
+If you go with the Mullvad add-on (Chapter 6’s recommendation), two
 flags matter when you’re mobile:
 
 ``` bash

@@ -3,10 +3,10 @@
 set -euo pipefail
 SD="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; C="$SD/../compose"
 
-mkdir -p ~/proxy
-cp "$C/Caddyfile"           ~/proxy/Caddyfile
-cp "$C/caddy.compose.yaml"  ~/proxy/compose.yaml
-( cd ~/proxy && docker compose up -d )
+mkdir -p ~/caddy
+cp "$C/Caddyfile"           ~/caddy/Caddyfile
+cp "$C/caddy.compose.yaml"  ~/caddy/compose.yaml
+( cd ~/caddy && docker compose up -d )
 sleep 4
-docker exec caddy cat /data/caddy/pki/authorities/local/root.crt > ~/proxy/caddy-root-ca.crt 2>/dev/null \
-  && echo "Exported ~/proxy/caddy-root-ca.crt (trust it on your devices)." || echo "CA not ready yet; re-run this line shortly."
+docker exec caddy cat /data/caddy/pki/authorities/local/root.crt > ~/caddy/caddy-root-ca.crt 2>/dev/null \
+  && echo "Exported ~/caddy/caddy-root-ca.crt (trust it on your devices)." || echo "CA not ready yet; re-run this line shortly."

@@ -66,7 +66,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 You should see five **Up** containers: `caddy`, `homepage`, `pihole`,
 `portainer`, `audiobookshelf`.
 
-**2. They share the proxy network (on the Pi):**
+**2. They share the homelab network (on the Pi):**
 
 ``` bash
 docker network inspect homelab --format "{{range .Containers}}{{.Name}} {{end}}"
@@ -83,7 +83,7 @@ dig +short pihole.home @127.0.0.1     # expect your Pi's Tailscale IP (100.x.y.z
 dig +short doubleclick.net @127.0.0.1 # expect 0.0.0.0 (ad-blocking works)
 ```
 
-**4. The proxy routes each name to the right service (on the Pi):**
+**4. Caddy routes each name to the right service (on the Pi):**
 
 ``` bash
 for name in pihole.home abs.home home.home; do
@@ -122,7 +122,7 @@ the usual culprit is a missing `version: 6`).
 
 Once the cloud setting above is on, here’s the honest picture the moment
 you leave the house, the full reasoning is in [Chapter
-8](../08-away-from-home/README.md):
+7](../07-away-from-home/README.md):
 
 | Mode (away) | Homelab URLs? | Pi-hole ad-block? | Hides your IP? |
 |----|----|----|----|

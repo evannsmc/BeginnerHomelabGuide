@@ -26,22 +26,22 @@ the public internet.
    Add Caddy and local DNS so you can type `https://pihole.home` and
    `https://abs.home` on your tailnet, no ports or IPs, with real HTTPS.
 5. **[A one-URL dashboard](chapter-5-dashboard.qmd).** Add Homepage and Portainer,
-   slotted into the proxy at `https://home.home` as a single landing page.
-6. **[Remoting into your machines from your phone](chapter-6-remoting-phone.qmd).**
-   Reach your Pi's terminal (Termius) and a full desktop (NoMachine) from your
-   phone, by Tailscale machine name.
+   slotted into Caddy at `https://home.home` as a single landing page.
 
 ## Volume II: On the road and your devices
 
-7. **[VPN privacy: Aura, Mullvad, and your options](chapter-7-vpn.qmd).** What a
-   VPN does, how Aura compares to Mullvad, and what a Tailscale exit node is, so
-   you can pick the approach that fits.
-8. **[On the road: homelab, Pi-hole, and VPN away from home](chapter-8-away-from-home.qmd).**
+6. **[VPN privacy: Aura, Mullvad, and your options](chapter-6-vpn.qmd).** What a
+   VPN does, how a mainstream app (I use Aura) compares to Mullvad, and what a
+   Tailscale exit node is, so you can pick the approach that fits.
+7. **[On the road: homelab, Pi-hole, and VPN away from home](chapter-7-away-from-home.qmd).**
    The field manual for leaving the house, and the one rule for why homelab
    access, Pi-hole, and a privacy VPN can't all run at once.
 
 ## Volume III: Extras
 
+8. **[Remoting into your machines from your phone](chapter-8-remoting-phone.qmd).**
+   Reach your Pi's terminal (Termius) and a full desktop (NoMachine) from your
+   phone, by Tailscale machine name.
 9. **[Wiring your phone into your Linux machines](chapter-9-phone-linux.qmd).**
    LocalSend and KDE Connect for file transfer and clipboard sharing over
    Tailscale, plus the USB fallback for bulk photo offload.
@@ -70,8 +70,8 @@ test.
 - **An iPhone** (the apps in Chapters 2 and 9 also exist for Android; the commands
   are identical).
 - **Docker** on the Pi, installed once in Chapter 1, reused by every later chapter.
-- A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapter 7 (both
-  optional, ~$5/month; Chapter 7 helps you choose).
+- A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapter 6 (both
+  optional, ~$5/month; Chapter 6 helps you choose).
 
 ## Conventions used throughout
 

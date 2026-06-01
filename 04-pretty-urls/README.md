@@ -84,7 +84,7 @@ services:
       - ./metadata:/metadata
 
     networks:
-      - homelab            # NEW: join the shared proxy network
+      - homelab            # NEW: join the shared homelab network
 
     restart: unless-stopped
 
@@ -114,7 +114,7 @@ no IP addresses needed between containers.
 ### Step 2: Free port 80 and extend Pi-hole onto the tailnet
 
 Three changes to Pi-hole’s `~/pihole/compose.yaml`, all needed before
-the proxy works:
+Caddy works:
 
 - **Free host port 80.** Caddy becomes the single front door on port 80,
   because that’s the port a browser hits for a bare URL like
@@ -187,17 +187,17 @@ Pi-hole’s admin UI now lives at `http://192.168.1.50:8081/admin` (your
 Pi’s LAN IP), but in a moment you’ll reach it as `https://pihole.home`
 instead.
 
-## Part B: Deploy the proxy and DNS
+## Part B: Deploy Caddy and DNS
 
 ### Step 3: Deploy Caddy
 
 Caddy is its own small stack:
 
 ``` bash
-mkdir -p ~/proxy && cd ~/proxy
+mkdir -p ~/caddy && cd ~/caddy
 ```
 
-Create `~/proxy/Caddyfile`, the entire routing table:
+Create `~/caddy/Caddyfile`, the entire routing table:
 
 ``` bash
 cat > Caddyfile <<'EOF'
@@ -220,7 +220,7 @@ abs.home {
 EOF
 ```
 
-Create `~/proxy/compose.yaml`:
+Create `~/caddy/compose.yaml`:
 
 ``` bash
 cat > compose.yaml <<'EOF'
@@ -308,7 +308,7 @@ For `*.home` to resolve on every device, your devices must ask
 > **Restrict to domain** and set the domain to `home`. Then only
 > `*.home` lookups go to Pi-hole and everything else uses each device’s
 > normal DNS. You lose tailnet-wide ad-blocking but keep the pretty
-> URLs. ([Chapter 8](../08-away-from-home/README.md) discusses how this
+> URLs. ([Chapter 7](../07-away-from-home/README.md) discusses how this
 > DNS choice interacts with VPNs when you’re away from home.)
 
 ## Part C: Use it and trust the cert
@@ -339,7 +339,7 @@ First, export the root certificate from the Caddy container (on the Pi):
 
 ``` bash
 docker exec caddy cat /data/caddy/pki/authorities/local/root.crt \
-  > ~/proxy/caddy-root-ca.crt
+  > ~/caddy/caddy-root-ca.crt
 ```
 
 Now get that file onto each device. Since every device is already on
@@ -348,8 +348,8 @@ send between your own machines, no AirDrop, no email, no cable:
 
 ``` bash
 # from the Pi (or any machine that has the file), send to a peer by its name:
-tailscale file cp ~/proxy/caddy-root-ca.crt <laptop-name>:
-tailscale file cp ~/proxy/caddy-root-ca.crt <iphone-name>:
+tailscale file cp ~/caddy/caddy-root-ca.crt <laptop-name>:
+tailscale file cp ~/caddy/caddy-root-ca.crt <iphone-name>:
 ```
 
 Find the exact peer names with `tailscale status`. (If the Pi answers
@@ -403,10 +403,10 @@ Every service from here on gets a pretty URL the same way, three small
 steps:
 
 1.  Put its container on the `homelab` network.
-2.  Add a block to `~/proxy/Caddyfile`:
+2.  Add a block to `~/caddy/Caddyfile`:
     `name.home { tls internal\n reverse_proxy container:PORT }`.
 3.  Add a `name.home → 100.x.y.z` record in Pi-hole, then
-    `docker compose restart    caddy` (in `~/proxy`).
+    `docker compose restart    caddy` (in `~/caddy`).
 
 Because you’ve already trusted Caddy’s CA, the new name gets a trusted
 cert automatically, no per-service certificate work. [Chapter
@@ -422,7 +422,7 @@ it `https://home.home`.
 - **Exit nodes break `.home`.** A Mullvad exit node routes DNS through
   Mullvad and bypasses Pi-hole, so `*.home` won’t resolve while one is
   active. This tension is the subject of [Chapter
-  8](../08-away-from-home/README.md); switch the exit node off (or use
+  7](../07-away-from-home/README.md); switch the exit node off (or use
   your home Pi as the exit node) to use the names.
 
 ## Recap

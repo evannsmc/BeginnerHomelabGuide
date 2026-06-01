@@ -92,19 +92,19 @@ The guide is two **volumes** of short chapters. Each chapter is grouped into
 | 3 | [03-pihole](03-pihole/README.md) | Network-wide ad blocking with Pi-hole |
 | 4 | [04-pretty-urls](04-pretty-urls/README.md) | A Caddy reverse proxy + local DNS for `*.home` URLs (HTTPS) |
 | 5 | [05-dashboard](05-dashboard/README.md) | A one-URL dashboard (Homepage) + Docker GUI (Portainer) |
-| 6 | [06-remoting-phone](06-remoting-phone/README.md) | Reach your machines from your phone: Termius (SSH) + NoMachine (desktop) |
 
 **Volume II, on the road and your devices**
 
 | Ch | Folder | What you build |
 |---|---|---|
-| 7 | [07-vpn](07-vpn/README.md) | VPN privacy: Aura vs Mullvad vs Tailscale exit nodes |
-| 8 | [08-away-from-home](08-away-from-home/README.md) | What works on the road, and the one-VPN rule |
+| 6 | [06-vpn](06-vpn/README.md) | VPN privacy: Aura vs Mullvad vs Tailscale exit nodes |
+| 7 | [07-away-from-home](07-away-from-home/README.md) | What works on the road, and the one-VPN rule |
 
 **Volume III, extras**
 
 | Ch | Folder | What you build |
 |---|---|---|
+| 8 | [08-remoting-phone](08-remoting-phone/README.md) | Reach your machines from your phone: Termius (SSH) + NoMachine (desktop) |
 | 9 | [09-phone-linux](09-phone-linux/README.md) | File + clipboard sharing between your phone and Linux |
 
 **Bonus reference:**
@@ -136,7 +136,7 @@ you create config, a `compose/` folder with the real `compose.yaml` / `Caddyfile
 (and the Homepage `config/` for the dashboard), ready to copy by hand. The scripts
 just install those same files and start the containers, so there's one copy of
 each, no drift. Secrets stay out; an `.env.example` shows the shape where a `.env`
-is needed. (`06-remoting-phone` and `08-away-from-home` are reading / app-setup, so
+is needed. (`07-away-from-home` and `08-remoting-phone` are reading / app-setup, so
 no scripts.) In the repo root:
 
 - **[`Beginner-Homelab-on-a-Raspberry-Pi.pdf`](Beginner-Homelab-on-a-Raspberry-Pi.pdf)**.

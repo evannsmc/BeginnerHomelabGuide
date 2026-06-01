@@ -4,7 +4,7 @@
 > for the full picture.
 
 
-# Chapter 6. Remoting into your machines from your phone
+# Chapter 8. Remoting into your machines from your phone
 
 > **The payoff of this chapter:** open a terminal on your Pi, or a full
 > graphical desktop on your laptop, straight from your phone, anywhere,

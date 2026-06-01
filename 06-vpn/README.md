@@ -5,26 +5,27 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Chapter 7. VPN privacy: Aura, Mullvad, and your options
+# Chapter 6. VPN privacy: Aura, Mullvad, and your options
 
 > **The payoff of this chapter:** understand what a VPN actually does
-> for you, see how the VPN you already use (Aura) compares to a
-> privacy-focused option (Mullvad), and learn the Tailscale-native way
-> to route traffic, the *exit node*, so you can pick the setup that
-> fits. The messier question of how all this behaves *away from home*
-> (and how it collides with your Pi-hole) gets its own treatment in
-> [Chapter 8](../08-away-from-home/README.md).
+> for you, see how a mainstream consumer VPN (I started with Aura)
+> compares to a privacy-focused option (Mullvad), and learn the
+> Tailscale-native way to route traffic, the *exit node*, so you can
+> pick the setup that fits. The messier question of how all this behaves
+> *away from home* (and how it collides with your Pi-hole) gets its own
+> treatment in [Chapter 7](../07-away-from-home/README.md).
 
 Everything so far has been about reaching *into* your homelab. This part
 is the opposite direction: making your devices’ traffic leave through a
 VPN, so the websites and apps you use can’t see your real IP address,
 and so your ISP or a café’s Wi-Fi can’t see what you’re doing.
 
-You already use **Aura VPN** to change locations. That’s a perfectly
-good consumer VPN. The goal here isn’t to talk you out of it, it’s to
-lay out the landscape clearly: what a VPN does, where Aura fits, where
-**Mullvad** fits, and the one Tailscale concept (the **exit node**) that
-ties VPNs into the homelab you’ve been building.
+Maybe you already run a consumer VPN to change locations. I started with
+**Aura VPN**, and it’s a perfectly good one. The goal here isn’t to talk
+you out of whatever you run, it’s to lay out the landscape clearly: what
+a VPN does, where a consumer app like Aura fits, where **Mullvad** fits,
+and the one Tailscale concept (the **exit node**) that ties VPNs into
+the homelab you’ve been building.
 
 ## What a VPN does (and what it doesn’t)
 
@@ -41,7 +42,7 @@ What a VPN does *not* do: it isn’t anonymity (the VPN provider can see
 your traffic, so provider trust matters), and it doesn’t block ads by
 itself unless the provider offers DNS-level filtering. Keep that
 ad-blocking caveat in mind, it’s the seam where VPNs and your Pi-hole
-rub against each other, which is exactly the Chapter 8 discussion.
+rub against each other, which is exactly the Chapter 7 discussion.
 
 ## The Tailscale exit node: a VPN built from your own tailnet
 
@@ -98,13 +99,14 @@ inside your tailnet.
 - **Why it’s the best fit here:** it *is* Tailscale, so it coexists with
   everything you’ve built, and crucially, it’s the only option that
   works on your iPhone *without* fighting Tailscale (more on that in
-  Chapter 8). The `--exit-node` choice is persistent across reboots, so
+  Chapter 7). The `--exit-node` choice is persistent across reboots, so
   “always on” is just setting it once.
 
 ### Option B: A standalone VPN app (Aura, or the Mullvad app)
 
-This is what you do today with **Aura**: a self-contained VPN app on
-each device that you toggle on to change location.
+This is the familiar consumer model, the one I started on with **Aura**:
+a self-contained VPN app on each device that you toggle on to change
+location.
 
 - **Aura:** part of the Aura identity-protection suite. A closed
   consumer app, easy to use, location-switching, with split tunneling on
@@ -116,10 +118,10 @@ each device that you toggle on to change location.
 - **Mullvad app:** a flat **€5/month** (~\$5.40), up to 5 devices,
   includes a proper **kill switch**, and (unlike Aura) Mullvad hands you
   **WireGuard config files** you can run anywhere, including on the Pi.
-  That openness is what makes the advanced setups in Chapter 8 possible.
+  That openness is what makes the advanced setups in Chapter 7 possible.
 
 The catch with *any* standalone VPN app is how it coexists with
-Tailscale, a genuinely thorny topic that’s the heart of Chapter 8. The
+Tailscale, a genuinely thorny topic that’s the heart of Chapter 7. The
 short version: **phones run only one VPN at a time**, so the
 Aura/Mullvad app and Tailscale are mutually exclusive on your iPhone.
 
@@ -158,11 +160,11 @@ privacy *and* wants it to mesh with everything else:
 - **Keep Option C (Pi as exit node) in your pocket** as a complement,
   not a replacement: flip to it when you want to appear at home or keep
   Pi-hole filtering active.
-- **Aura (Option B) is fine to keep** as a standalone tool, but
-  understand it won’t integrate with the homelab. It can’t run on the
-  Pi, and on your phone it can’t run at the same time as Tailscale. That
-  trade-off, and how to live with it on the road, is precisely what
-  Chapter 8 unpacks.
+- **A consumer app like Aura (Option B) is fine to keep** as a
+  standalone tool, but understand it won’t integrate with the homelab.
+  It can’t run on the Pi, and on your phone it can’t run at the same
+  time as Tailscale. That trade-off, and how to live with it on the
+  road, is precisely what Chapter 7 unpacks.
 
 > [!NOTE]
 >
@@ -185,10 +187,10 @@ privacy *and* wants it to mesh with everything else:
   iPhone), **B)** a standalone app like Aura or Mullvad’s own, **C)**
   your Pi as a free-but-not-private exit node.
 - **Recommendation:** use Option A for privacy, keep Option C for
-  appear-at-home, and know Aura’s limits before relying on it.
+  appear-at-home, and know a consumer VPN’s limits before relying on it.
 
 You now know your VPN options and how to turn each one on. The hard
 part, what actually happens to your Pi-hole, your homelab access, and
 your VPN when you walk out the front door, and how to get a setup that
 doesn’t fight itself, is next, in [Chapter
-8](../08-away-from-home/README.md).
+7](../07-away-from-home/README.md).

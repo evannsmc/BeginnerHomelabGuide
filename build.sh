@@ -20,15 +20,15 @@ chapter-2-audiobookshelf:02-audiobookshelf
 chapter-3-pihole:03-pihole
 chapter-4-pretty-urls:04-pretty-urls
 chapter-5-dashboard:05-dashboard
-chapter-6-remoting-phone:06-remoting-phone
-chapter-7-vpn:07-vpn
-chapter-8-away-from-home:08-away-from-home
+chapter-6-vpn:06-vpn
+chapter-7-away-from-home:07-away-from-home
+chapter-8-remoting-phone:08-remoting-phone
 chapter-9-phone-linux:09-phone-linux
 appendix-a-compose-explained:appendix-a-compose
 appendix-b-verify:appendix-b-verify"
 
 # folders that ship helper scripts (these get the "scripts" banner)
-HAS_SCRIPTS="01-foundation 02-audiobookshelf 03-pihole 04-pretty-urls 05-dashboard 07-vpn 09-phone-linux"
+HAS_SCRIPTS="01-foundation 02-audiobookshelf 03-pihole 04-pretty-urls 05-dashboard 06-vpn 09-phone-linux"
 
 echo "==> Rendering the whole book (PDF) from book/"
 ( cd "$BOOK" && quarto render --to pdf >/dev/null )
