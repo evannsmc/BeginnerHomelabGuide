@@ -184,7 +184,7 @@ Your tailnet is one shared namespace, signing in with the same account
 simply adds the laptop as another peer. From now on you can
 `ssh you@homelab` from the laptop over the tailnet, anywhere.
 
-### Step 6: Install Tailscale on your iPhone
+### Step 6: Install Tailscale on iPhone
 
 Install **Tailscale** from the App Store and sign in with the same
 account. You should see `homelab` (and your laptop) listed as peers.
@@ -225,11 +225,11 @@ online, and `ssh homelab` logs you in, the foundation is done.
 - **Flashed** a headless 64-bit Linux (Ubuntu Server 26.04 LTS) with
   key-only SSH (no passwords, no open ports).
 - **Installed Docker** on the Pi, the runtime for every later service.
-- **Built your tailnet:** the Pi, your laptop, and your iPhone all on
-  one private WireGuard mesh, signed into one account.
+- **Built your tailnet:** the Pi, your laptop, and your phone all on one
+  private WireGuard mesh, signed into one account.
 - **Named the Pi `homelab`** via MagicDNS, so everything is reachable by
   name.
 
 The platform is ready. In [Chapter 2](../02-audiobookshelf/README.md) we
 put it to work: ripping your Assimil discs and serving them from the Pi
-to your iPhone over the tailnet you just built.
+to your phone over the tailnet you just built.

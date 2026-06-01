@@ -5,15 +5,15 @@
 > them before running and adapt as needed. See the [main README](../README.md).
 
 
-# Chapter 9. Wiring your iPhone into your Linux machines
+# Chapter 9. Wiring your phone into your Linux machines
 
-> **The payoff of this chapter:** move files between your iPhone and
-> your Linux laptop in one tap, share a clipboard and see your phone’s
+> **The payoff of this chapter:** move files between your phone and your
+> Linux laptop in one tap, share a clipboard and see your phone’s
 > battery on the desktop, do the same to your Pi from anywhere over
 > Tailscale, and know the one wired fallback (USB) for when Wi-Fi isn’t
 > an option, without installing a pile of tools you’ll never use.
 
-You’ve built a homelab your iPhone can reach. This part closes the loop
+You’ve built a homelab your phone can reach. This part closes the loop
 in the *other* direction: getting your phone and your Linux machines to
 talk to each other for the everyday stuff, “send me that PDF,” “paste
 this URL onto my desktop,” “pull these photos off my phone.” On a Mac

@@ -1,8 +1,8 @@
-# Chapter 2. Streaming audiobooks to your iPhone with Audiobookshelf {#sec-part2}
+# Chapter 2. Streaming audiobooks to your phone with Audiobookshelf {#sec-part2}
 
 > **The payoff of this chapter:** a collection of spoken audio (audiobooks,
 > podcasts, language courses, anything) copied once and served from the Raspberry
-> Pi you set up in Chapter 1, streaming to your iPhone from anywhere over your
+> Pi you set up in Chapter 1, streaming to your phone from anywhere over your
 > tailnet, with proper audiobook-style resume tracking (pause mid-sentence today,
 > resume at the same second tomorrow).
 

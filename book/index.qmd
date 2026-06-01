@@ -67,8 +67,9 @@ test.
 - **A laptop/desktop** (Linux assumed) to flash the card and use as a client.
 - **A free Tailscale account.** One account, signed into on every device, is the
   connective tissue for the entire series.
-- **An iPhone** (the apps in Chapters 2 and 9 also exist for Android; the commands
-  are identical).
+- **A phone.** I use an **iPhone**, so the phone steps throughout show the iOS
+  apps; each one has an Android build with identical commands, so use your
+  platform's equivalent.
 - **Docker** on the Pi, installed once in Chapter 1, reused by every later chapter.
 - A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapter 6 (both
   optional, ~$5/month; Chapter 6 helps you choose).
@@ -80,6 +81,11 @@ test.
   `docker`.
 - Commands prefixed with `sudo` need administrator rights; the rest run as your
   normal user.
+- **The phone in the examples is an iPhone.** I use one, so every phone step
+  (Audiobookshelf, Tailscale, Termius, NoMachine, LocalSend) shows the iOS app,
+  and I write *iPhone* to mean "the phone in this example," not an assumption that
+  you own one. Each of those apps has an Android build with the same commands, so
+  swap in your platform's app wherever you see *iPhone*.
 - **Placeholders, substitute your own.** Wherever you see a Tailscale address
   like `100.x.y.z`, run `tailscale ip -4` on that machine to get the real one.
   This guide names the Raspberry Pi `homelab` on the tailnet; its full DNS name

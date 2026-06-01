@@ -67,7 +67,7 @@ nodes**, giving you a real privacy VPN *inside* the same Tailscale app
 you already run, with no second VPN client. That’s the key to making VPN
 and homelab coexist, and it’s why Mullvad gets special attention below.
 
-## Your three real options
+## Your options (three simple, one advanced)
 
 ### Option A: Tailscale’s Mullvad add-on *(best fit for this homelab)*
 
@@ -98,9 +98,9 @@ inside your tailnet.
 
 - **Why it’s the best fit here:** it *is* Tailscale, so it coexists with
   everything you’ve built, and crucially, it’s the only option that
-  works on your iPhone *without* fighting Tailscale (more on that in
-  Chapter 7). The `--exit-node` choice is persistent across reboots, so
-  “always on” is just setting it once.
+  works on iPhone *without* fighting Tailscale (more on that in Chapter
+  7). The `--exit-node` choice is persistent across reboots, so “always
+  on” is just setting it once.
 
 ### Option B: A standalone VPN app (Aura, or the Mullvad app)
 
@@ -123,7 +123,7 @@ location.
 The catch with *any* standalone VPN app is how it coexists with
 Tailscale, a genuinely thorny topic that’s the heart of Chapter 7. The
 short version: **phones run only one VPN at a time**, so the
-Aura/Mullvad app and Tailscale are mutually exclusive on your iPhone.
+Aura/Mullvad app and Tailscale are mutually exclusive on a phone.
 
 ### Option C: Your Pi as a self-hosted exit node (free, but not private)
 
@@ -146,6 +146,77 @@ IPv6 equivalent).
   there’s no hiding. And don’t use a *phone* as an exit node. It routes
   in userspace and is slow; the Pi (kernel routing) is fine.
 
+### Option D: A self-hosted exit node, made private with Mullvad *(advanced)*
+
+Option C hides nothing, because the Pi exits from your own home IP. You
+can fix that by *chaining*: run an exit node that itself tunnels out
+through a standalone Mullvad **WireGuard** config. Your devices reach
+the node over the tailnet, and the node forwards their traffic out
+through Mullvad:
+
+    you -> Tailscale -> your exit-node box -> Mullvad WireGuard -> internet
+
+This is the only way to use a **standalone** Mullvad subscription *as a
+Tailscale exit node* without paying for the add-on. The shape of it:
+
+1.  Use a machine that is **not your home Pi** if privacy is the goal (a
+    cheap Linux VPS works well). The home Pi only makes sense for
+    “appear at home,” where adding Mullvad would defeat the purpose.
+2.  On that box, install Tailscale, advertise it as an exit node
+    (`sudo tailscale set --advertise-exit-node`, then approve it in the
+    admin console), and enable IP forwarding.
+3.  Download a **WireGuard config** from your Mullvad account and bring
+    it up (`wg-quick up <conf>`) so the box’s default route leaves
+    through Mullvad.
+4.  The sharp edge: Mullvad’s config claims the **entire** default route
+    (`AllowedIPs = 0.0.0.0/0`), which also swallows the return path to
+    your tailnet. You have to keep Tailscale’s range (`100.64.0.0/10`)
+    out of the Mullvad tunnel so your devices can still reach the node.
+    That policy-routing fiddliness is exactly the work the add-on saves
+    you.
+
+Reach for this if you already pay for Mullvad and enjoy the plumbing.
+For most people the add-on (Option A) buys the same outcome for about
+\$5/month with none of the routing surgery.
+
+## Can you run the VPN *and* Pi-hole? (home vs. the road)
+
+This is the question that trips everyone up, because a privacy VPN and
+Pi-hole both want to own your **DNS**, and that overlap is where they
+collide.
+
+- **At home, on a computer, it is mostly a non-issue, because you
+  usually do not need the privacy VPN here.** Pi-hole is already
+  cleaning ads for every device on the network, and you trust your own
+  connection, so the normal state is *Pi-hole on, privacy VPN off*. When
+  you do want to change location or hide your IP for a bit, you flip a
+  standalone Mullvad config on for that session. While it is on, Mullvad
+  carries your DNS too, so for that window you lean on Mullvad’s own
+  built-in ad and tracker blocking instead of Pi-hole, then switch it
+  back off. A standalone Mullvad subscription handles this case on a
+  laptop perfectly well, with no Tailscale involved.
+- **Away from home is where it actually bites,** because now you want
+  *both* at once: the privacy VPN (you are on untrusted Wi-Fi) *and*
+  your tailnet and Pi-hole. On a **phone that is impossible with two
+  separate apps**, since a phone runs only one VPN tunnel at a time, so
+  Mullvad’s app and Tailscale cannot both be on. That single limit is
+  the whole reason the add-on exists.
+
+So on the road you have two honest choices:
+
+- **Convenience, the Tailscale Mullvad add-on (Option A).** One tunnel
+  does both: you stay on Tailscale, so the tailnet and Pi-hole DNS keep
+  working, while your traffic exits through Mullvad. Nothing to toggle.
+- **Separate and switch, a standalone Mullvad app *plus* Tailscale,
+  picking one in the moment.** Mullvad on when privacy matters most (you
+  give up the homelab and Pi-hole for that stretch), Tailscale on when
+  you need the homelab or Pi-hole (you give up the privacy VPN). It
+  costs nothing beyond the Mullvad sub and stays fully flexible; you
+  just cannot have both at the same instant on a phone.
+
+[Chapter 7](../07-away-from-home/README.md) is the field manual for living
+with this on the road.
+
 ## Recommendation
 
 For a homelab that’s already built on Tailscale and a user who wants
@@ -154,9 +225,9 @@ privacy *and* wants it to mesh with everything else:
 - **For privacy / location changing: Option A (Tailscale’s Mullvad
   add-on).** It’s the same price ballpark as Aura or a standalone
   Mullvad sub, but it lives inside the one VPN your devices already run,
-  so it’s the only choice that works cleanly on your iPhone alongside
-  the rest of the homelab, and the setting persists across reboots for
-  true “always on.”
+  so it’s the only choice that works cleanly on iPhone alongside the
+  rest of the homelab, and the setting persists across reboots for true
+  “always on.”
 - **Keep Option C (Pi as exit node) in your pocket** as a complement,
   not a replacement: flip to it when you want to appear at home or keep
   Pi-hole filtering active.
@@ -183,9 +254,13 @@ privacy *and* wants it to mesh with everything else:
 - A Tailscale **exit node** is a VPN built from your tailnet; with the
   **Mullvad add-on**, Mullvad’s servers *are* your exit nodes, inside
   the app you already run.
-- Three options: **A)** Tailscale’s Mullvad add-on (best fit, works on
+- Four options: **A)** Tailscale’s Mullvad add-on (best fit, works on
   iPhone), **B)** a standalone app like Aura or Mullvad’s own, **C)**
-  your Pi as a free-but-not-private exit node.
+  your Pi as a free-but-not-private exit node, and **D)** a standalone
+  Mullvad chained behind your own exit node (advanced, no add-on).
+- **At home** you rarely need the privacy VPN, so Pi-hole just runs;
+  **on the road** a phone forces you to pick one, which is why the
+  add-on (one tunnel for both) is so convenient.
 - **Recommendation:** use Option A for privacy, keep Option C for
   appear-at-home, and know a consumer VPN’s limits before relying on it.
 
