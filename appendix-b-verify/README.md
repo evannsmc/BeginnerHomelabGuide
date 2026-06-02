@@ -120,8 +120,8 @@ the usual culprit is a missing `version: 6`).
 
 ## What works away from home (and what deliberately doesn’t)
 
-Once the cloud setting above is on, here’s the honest picture the moment
-you leave the house, the full reasoning is in [Chapter
+Once the cloud setting above is on, this is what happens the moment you
+leave the house, the full reasoning is in [Chapter
 7](../07-away-from-home/README.md):
 
 | Mode (away) | Homelab URLs? | Pi-hole ad-block? | Hides your IP? |

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Point pihole.home / abs.home / home.home at the Pi's Tailscale IP (run on the Pi). Small self-contained helper; this is the setup I use and test, adapt as needed.
-set -euo pipefail
+# Point home.home at the Pi's Tailscale IP.
 set -euo pipefail
 
 TSIP=$(tailscale ip -4 | head -1)

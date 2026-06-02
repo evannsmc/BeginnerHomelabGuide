@@ -1,18 +1,17 @@
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 
-# Chapter 2. Streaming audiobooks to your phone with Audiobookshelf
+# Chapter 2. Streaming audiobooks to a phone with Audiobookshelf
 
 > **The payoff of this chapter:** a collection of spoken audio
 > (audiobooks, podcasts, language courses, anything) copied once and
-> served from the Raspberry Pi you set up in Chapter 1, streaming to
-> your phone from anywhere over your tailnet, with proper
-> audiobook-style resume tracking (pause mid-sentence today, resume at
-> the same second tomorrow).
+> served from the Raspberry Pi from Chapter 1, streaming to a phone from
+> anywhere over the tailnet, with proper audiobook-style resume tracking
+> (pause mid-sentence today, resume at the same second tomorrow).
 
 > [!NOTE]
 >
@@ -20,27 +19,27 @@
 >
 > This part shows how to serve **any** spoken audio from your Pi. The
 > running example I use throughout is my own use case: a
-> language-learning audio course I ripped from CD, because what I
-> actually wanted was to study on my lunch break with just the book and
-> none of the discs. Wherever you see the course, picture your own
-> audiobooks; the steps are the same.
+> language-learning audio course I ripped from CD, because I wanted to
+> study on my lunch break with just the book and none of the discs.
+> Wherever you see the course, picture your own audiobooks; the steps
+> are the same.
 
 In [Chapter 1](../01-foundation/README.md) you built the platform: a Pi
-named `homelab` running Docker and on your tailnet, reachable by name
-from your laptop and iPhone. Now we put it to work with
-**Audiobookshelf**, a self-hosted media server purpose-built for spoken
-audio. It runs in a Docker container, scans a folder of MP3s, and serves
-a web UI plus a JSON API consumed by official iOS and Android apps.
+named `homelab`, Docker installed, tailnet reachable from a
+laptop/desktop and phone. This is where it starts doing something
+useful. **Audiobookshelf** is a self-hosted server for spoken audio. It
+runs in Docker, scans a folder of MP3s, and gives you a web UI plus iOS
+and Android apps.
 
 **Why an audiobook server and not a music server:** music servers
 (Navidrome, Plex, Jellyfin) track “what song you played last.” Audiobook
 servers track “second 247 of track 14 of book X” and sync that position
 across every device. For anything where you pause mid-sentence and
-resume tomorrow, like a language course or a long audiobook, that’s the
-whole point. So Audiobookshelf here is strictly for **spoken** audio:
-audiobooks, courses, and (later) podcasts. If I add music down the line
-it gets its own dedicated server, like **Navidrome**, in its own folder,
-not this one.
+resume tomorrow, like a language course or a long audiobook, resume
+tracking is the feature. Audiobookshelf here is strictly for **spoken**
+audio: audiobooks, courses, and (later) podcasts. If I add music down
+the line it gets its own dedicated server, like **Navidrome**, in its
+own folder, not this one.
 
 In my example the audio starts on CDs, so I need a CD/DVD drive
 somewhere. Use whatever you’ve got: your laptop or desktop’s built-in
@@ -54,8 +53,8 @@ is already files on disk, skip the ripping and just copy it into
 ## Prerequisites
 
 - You finished [Chapter 1](../01-foundation/README.md): the Pi (`homelab`)
-  is on your tailnet with Docker installed, and your laptop and iPhone
-  are on the tailnet too.
+  is on the tailnet with Docker installed, and at least one client
+  device is on the tailnet too.
 
 - A **CD/DVD drive with the disc inserted**, on whichever machine is
   handy: a built-in drive, or a USB external plugged into the laptop or
@@ -80,7 +79,7 @@ is already files on disk, skip the ripping and just copy it into
 
 ## Part A: Rip and copy the audio
 
-### Step 1: Inspect what’s actually on the disc
+### Step 1: Inspect the disc layout
 
 Don’t assume the layout. List the mount point (substitute the real label
 that `udisksctl` just printed):
@@ -212,6 +211,15 @@ printf 'config/\nmetadata/\nmedia/\n' > .gitignore
 docker compose up -d
 ```
 
+If you are using the chapter scripts instead of typing the file by hand,
+run these in order from the repo checkout:
+
+``` bash
+02-audiobookshelf/scripts/01-make-dirs.sh
+02-audiobookshelf/scripts/02-create-compose.sh
+02-audiobookshelf/scripts/03-start-audiobookshelf.sh
+```
+
 > [!NOTE]
 >
 > ### Why everything lives under `~/audiobookshelf/`
@@ -289,11 +297,12 @@ Open the library, open *My Course*: you should see 100 numbered
 chapters. Click chapter 1. It should play in the browser. If it does,
 the server is fully functional.
 
-### Step 6: Connect the iPhone
+### Step 6: Connect the phone app
 
-1.  Install **Audiobookshelf** from the App Store (by `advplyr`, same as
-    the server). Tailscale is already installed and signed in from
-    Chapter 1.
+1.  Install **Audiobookshelf** on the phone. The example here uses the
+    iOS app from the App Store (by `advplyr`, same as the server);
+    Android has its own build. Tailscale is already installed and signed
+    in from Chapter 1.
 2.  Open it, tap **Add Server**:
     - **Server address:** `http://homelab:13378` (or
       `http://100.x.y.z:13378` using the Pi’s Tailscale IP).
@@ -310,7 +319,7 @@ the server is fully functional.
 - **Skip & scrub:** ±10s / ±30s buttons; tap-and-hold to scrub.
 - **Bookmarks:** drop a named marker at the current position for phrases
   to revisit.
-- **Cross-device progress:** pause on the iPhone, open the web UI at
+- **Cross-device progress:** pause in the phone app, open the web UI at
   home, resume at the same second.
 - **Offline downloads:** tap the download icon to cache a book locally,
   your saving grace if a network is hostile to VPNs. Downloaded audio
@@ -340,10 +349,10 @@ container preserves everything.
 
 ## Troubleshooting
 
-**The iPhone app says “Cannot connect.”** From the phone’s Safari, visit
-`http://homelab:13378`. If Safari also fails, Tailscale isn’t up, open
-the Tailscale app and confirm both devices show green dots. If Safari
-works but the app fails, you typed the wrong port (13378).
+**The phone app says “Cannot connect.”** From the phone’s browser, visit
+`http://homelab:13378`. If the browser also fails, Tailscale isn’t up,
+open the Tailscale app and confirm both devices show green dots. If
+Safari works but the app fails, you typed the wrong port (13378).
 
 **Tracks play in the wrong order.** Audiobookshelf sorts by filename.
 Rename so they sort correctly (`Lesson 01.mp3`, not `Lesson 1.mp3`),
@@ -360,15 +369,15 @@ destination mode: `ls -ld /path`. A `dr-x------` directory is missing
 its write bit; fix with `chmod u+w /path` (or `chmod 755`) and re-run.
 
 **Work Wi-Fi blocks Tailscale.** Tailscale falls back to DERP relays
-automatically (slower but works). Last resort: download lessons to the
-iPhone before leaving home, cached audio plays fully offline.
+automatically (slower but works). Last resort: download lessons in the
+phone app before leaving home, cached audio plays fully offline.
 
 ## Recap
 
 - **Copied** the audio off the disc straight onto the Pi with
   `rsync --no-perms`.
 - **Ran** Audiobookshelf on the Pi as a small `docker compose` project.
-- **Connected** the iPhone app to `http://homelab:13378`.
+- **Connected** the phone app to `http://homelab:13378`.
 
 Your course is now permanently available from any device on your
 tailnet, with proper progress tracking and no subscription. Next, in

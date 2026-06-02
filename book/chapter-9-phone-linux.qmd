@@ -1,23 +1,23 @@
-# Chapter 9. Wiring your phone into your Linux machines {#sec-part8}
+# Chapter 9. Wiring a phone into Linux machines {#sec-part8}
 
-> **The payoff of this chapter:** move files between your phone and your Linux
-> laptop in one tap with LocalSend, the one app that's all you need on an iPhone,
+> **The payoff of this chapter:** move files between a phone and a Linux
+> laptop in one tap with LocalSend, the app I use on an iPhone,
 > reach your Pi the same way from anywhere over Tailscale, know when KDE Connect's
 > clipboard sync is worth adding (and when it isn't), and have the one wired
 > fallback (USB) for when Wi-Fi isn't an option.
 
-You've built a homelab your phone can reach. This part closes the loop in the
-*other* direction: getting your phone and your Linux machines to talk to each
+The homelab is now reachable from mobile devices. This part closes the loop in the
+*other* direction: getting a phone and Linux machines to talk to each
 other for the everyday stuff, "send me that PDF," "paste this URL onto my
-desktop," "pull these photos off my phone." On a Mac you'd reach for AirDrop and
-Handoff; on Linux you assemble the same conveniences from two small apps, plus
+desktop," "pull these photos off the phone." On a Mac, AirDrop and Handoff are
+the obvious defaults; on Linux you assemble the same conveniences from two small apps, plus
 one wired option you'll rarely need.
 
 Get one thing straight first: **these are three different tools solving three
 different problems.** Don't think "which one wins", think "which job am I
 doing."
 
-## The two Wi-Fi tools (and why LocalSend is the one to start with)
+## The two Wi-Fi tools (and why I start with LocalSend)
 
 | Job | LocalSend | KDE Connect |
 |:---|:---|:---|
@@ -29,18 +29,18 @@ doing."
 | Dead-simple, one-purpose app | Yes | No |
 
 ::: {.callout-important}
-## On an iPhone, LocalSend is the one to reach for
+## On an iPhone, I start with LocalSend
 KDE Connect's headline features, notification mirroring, replying to texts from
 your desktop, running commands on the phone, are **Android-only**: Apple's
 sandbox forbids a third-party app from reading other apps' notifications or
 sending SMS, so on iOS none of that works no matter what a generic comparison
 table claims. That leaves the iOS KDE Connect app doing just file transfer,
-clipboard sync, and battery status, in a clunkier, less polished package than
-LocalSend. For the job almost everyone actually has on a phone, moving files,
+clipboard sync, and battery status, in a clunkier package than LocalSend. For
+the job almost everyone has on a phone, moving files,
 **LocalSend is simpler, nicer-looking, more reliable in day-to-day use, and all
 you need.** Reach for KDE Connect
 only if you specifically want clipboard sync or battery on your desktop and don't
-mind the extra setup; on an iPhone it's genuinely optional, and plenty of people
+mind the extra setup; on an iPhone it's optional, and plenty of people
 (me included) skip it. One more iOS quirk if you do run it: Apple's background
 limits mean the KDE Connect app must be **open or recently used** to stay
 reachable, so it can't sit dormant for days and still answer.
@@ -48,31 +48,30 @@ reachable, so it can't sit dormant for days and still answer.
 
 ### LocalSend: your AirDrop replacement
 
-Think of LocalSend as a dedicated screwdriver: it does exactly one thing,
-extremely well. Open it, pick a nearby device, send the file. No pairing, no
+LocalSend is focused: open it, pick a nearby device, send the file. No pairing, no
 account, no integration, and it cheerfully moves a 5 GB video that you'd never
 want to push through a more "integrated" tool.
 
 That's its entire job, and it's the right tool whenever the task is purely
-"get this file from here to there." It also tends to *just work*: the connection
+"get this file from here to there." The connection
 finds the other device and the transfer goes through more consistently than KDE
 Connect's does, and, just as important on an iPhone, **everything the app offers
-actually works**, nothing greyed out, Android-only, or quietly broken. That
-reliability is a big part of why it's the one to lean on.
+works**, nothing greyed out, Android-only, or quietly broken. That
+reliability is why I lean on it.
 
 ### KDE Connect: the optional companion
 
-KDE Connect is the multitool, and on Android it's genuinely powerful. On an
+KDE Connect is the multitool, and on Android it is powerful. On an
 iPhone its reach is narrower: the one feature worth having is the **shared
-clipboard** (copy `192.168.1.50` on your phone, paste it on your desktop), with
+clipboard** (copy `192.168.1.50` on the phone, paste it on the desktop), with
 **battery status** on your desktop panel as a minor extra. The notification and
 SMS superpowers are Android-only, so on iOS that's the whole story, and whether
 it's worth a second, fiddlier app over just using LocalSend is a real question,
 answered next.
 
-### Do you actually need KDE Connect on an iPhone?
+### Do you need KDE Connect on an iPhone?
 
-Honestly, probably not. LocalSend already covers the thing you do constantly,
+Probably not. LocalSend already covers the thing most people do constantly,
 moving files, and it does it with a cleaner app and zero pairing. The only reason
 to add KDE Connect on an iPhone is if you want **clipboard sync** between phone
 and desktop often enough to justify a second, clunkier app. If that's you,
@@ -85,13 +84,13 @@ well worth running alongside LocalSend.)
 
 ### On the iPhone
 
-Install **LocalSend** from the App Store, that's the one you'll actually use. If
+Install **LocalSend** from the App Store, that's the app this chapter starts with. If
 you also want clipboard sync, grab **KDE Connect** too (the KDE Connect one is
 published by KDE e.V.); both are free.
 
 ### On your Linux laptop
 
-**LocalSend** ships a proper Debian package, so on Ubuntu/Debian the cleanest
+**LocalSend** ships a proper Debian package, so on Ubuntu/Debian the direct
 install is to grab the `.deb` from
 [localsend.org/download](https://localsend.org/download) and hand it to `apt`,
 which pulls in any dependencies and wires it into your normal updates:
@@ -181,7 +180,7 @@ conveniences stop being a home-only luxury.
 
 Keep one thing in mind here: LocalSend and KDE Connect are **desktop** tools.
 Your Pi from Chapters 1–5 runs a **headless** server OS (Ubuntu Server 26.04 LTS),
-no graphical desktop, so neither app is the natural fit there. For moving a file between your phone and
+no graphical desktop, so neither app is the natural fit there. For moving a file between a phone and
 the Pi, you already have better, GUI-free paths:
 
 - **Drop it into a service you already run.** Files you want *on* the Pi
@@ -204,8 +203,8 @@ Tailscale.
 ## The wired fallback: USB access with libimobiledevice
 
 Everything above is Wi-Fi. USB is a **completely separate technology stack**,
-and (honestly) most people rarely need it. Install it the day you actually
-hit one of these, not before:
+and most people rarely need it. Install it when one of these comes up, not
+before:
 
 - No Wi-Fi available and you need photos off the phone *now*.
 - You're moving 100 GB of video and want the fastest possible transfer.
@@ -232,7 +231,7 @@ fusermount -u ~/iphone           # unmount when done
 ```
 
 ::: {.callout-note}
-## What USB actually gives you (and what it doesn't)
+## What USB gives you (and what it doesn't)
 `usbmuxd` is the daemon that talks to the phone over the USB cable;
 `libimobiledevice` is the library implementing Apple's protocols; `ifuse` mounts
 the result as a folder. Because of iOS's sandbox, `ifuse` exposes the **photos/
@@ -248,7 +247,7 @@ package.
 On an iPhone, begin with one app:
 
 1. **LocalSend**, the AirDrop replacement that handles the file job everyone
-   actually has, and whose features all reliably work.
+   has, and whose features work reliably.
 
 Add **KDE Connect** only if you find yourself wanting clipboard sync between phone
 and desktop; on Android, add it from the start, where its notification and SMS
@@ -264,8 +263,8 @@ backup and a power-user tool, not a daily requirement.
 
 ## Recap: and the series, complete
 
-- **LocalSend** = the one to start with: dead-simple file send with a clean app
-  whose features all actually work, install it on the iPhone and the laptop and
+- **LocalSend** = start here: dead-simple file send with a clean app
+  whose features work reliably, install it on the example iPhone and the laptop and
   you're set for the common case.
 - **KDE Connect** = optional companion: handy for clipboard sync and battery, but
   on an iPhone it's limited (notifications/SMS are Android-only) and clunkier, so
@@ -276,12 +275,12 @@ backup and a power-user tool, not a daily requirement.
 - **The headless Pi** stays on SSH/`scp` over Tailscale, the right tool for a
   machine with no desktop.
 - **USB (`libimobiledevice` + `ifuse`)** is the wired fallback for bulk photo
-  offload or no-Wi-Fi emergencies, install it only when you actually need it.
+  offload or no-Wi-Fi emergencies, install it only when needed.
 
 That completes *Beginner Homelab on a Raspberry Pi*. You started by building a
 foundation (a hardened, always-on Pi on a private Tailscale network) and then
 gave it job after job: streaming your media, blocking ads on every device, clean
 `http://*.home` URLs behind a reverse proxy, a single `https://home.home` control
 panel, a deliberate answer for VPN privacy on the road, and now two-way file
-sharing with your phone. Every piece runs on hardware you own, over one private
+sharing with a phone. Every piece runs on hardware under the reader's control, over one private
 network, with nothing exposed to the public internet.

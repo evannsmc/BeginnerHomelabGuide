@@ -4,16 +4,15 @@
 > for the full picture.
 
 
-# Chapter 8. Remoting into your machines from your phone
+# Chapter 8. Remoting into machines from a phone
 
 > **The payoff of this chapter:** open a terminal on your Pi, or a full
-> graphical desktop on your laptop, straight from your phone, anywhere,
-> by typing the machine’s name. No IP addresses, no port forwarding,
-> just the Tailscale name.
+> graphical desktop on a laptop, straight from a phone, anywhere, by
+> typing the machine’s name. No IP addresses, no port forwarding, just
+> the Tailscale name.
 
 By now everything on your tailnet is reachable by name. This chapter
-puts that to work from the device you always have on you: your phone.
-Two tools cover the two things you’ll actually want:
+puts that to work from a phone. Two tools cover the two common jobs:
 
 | Tool | What it gives you | Good for |
 |----|----|----|
@@ -21,8 +20,8 @@ Two tools cover the two things you’ll actually want:
 | **NoMachine** | A full remote **desktop** (mouse, windows) | A machine that has a GUI (your laptop/desktop) |
 
 The Pi has no desktop, so you reach it with **Termius** (SSH). When you
-want to click around a real desktop from your phone, that’s
-**NoMachine**, pointed at a machine that actually runs one.
+want to click around a real desktop from a phone, that’s **NoMachine**,
+pointed at a machine that runs one.
 
 > [!TIP]
 >
@@ -38,17 +37,17 @@ want to click around a real desktop from your phone, that’s
 > like `desktop-3f2a` are the thing that makes remote access annoying;
 > fix that once here.
 
-## Part A. SSH from your phone with Termius
+## Part A. SSH from a phone with Termius
 
-**Termius** is a free, polished SSH client for iOS and Android. Because
-your phone runs Tailscale, it resolves your machine names directly, so
-you connect to `homelab` exactly like you would from your laptop.
+**Termius** is a free SSH client for iOS and Android. Because the phone
+runs Tailscale, it resolves your machine names directly, so you connect
+to `homelab` exactly like you would from your laptop.
 
-### Step 1: Confirm your phone is on the tailnet
+### Step 1: Confirm the phone is on the tailnet
 
 Open the **Tailscale** app on the phone and make sure it’s connected
-(you set this up in Chapter 1). That’s what lets `homelab` resolve. On
-cellular or any Wi-Fi, it just works.
+(this was set up in Chapter 1). That’s what lets `homelab` resolve. On
+cellular or any Wi-Fi, the name resolves over the tailnet.
 
 ### Step 2: Install Termius and add the Pi as a host
 
@@ -79,16 +78,16 @@ key it trusts. Two easy ways:
   Keychain, since that key is already authorized on the Pi.
 
 Attach the key to the host, tap to connect, and you have a terminal on
-the Pi from your phone. From here you can run `docker compose`, check
+the Pi from the phone. From here you can run `docker compose`, check
 logs, restart a service, anything you’d do over SSH at your desk.
 
 ## Part B. A full desktop with NoMachine
 
 Sometimes you want a real **graphical desktop**, not a terminal: a
 browser, a file manager, a GUI app. **NoMachine** streams a machine’s
-desktop to your phone, fast enough to actually use. It needs a machine
-that **has** a desktop, so this is for your **Linux laptop or desktop**,
-not the headless Pi.
+desktop to a phone, fast enough to use. It needs a machine that **has**
+a desktop, so this is for your **Linux laptop or desktop**, not the
+headless Pi.
 
 ### Step 4: Install the NoMachine server on the GUI machine
 
@@ -103,8 +102,8 @@ sudo apt --fix-broken install
 ```
 
 Installing it starts the NoMachine **server**, which listens on port
-**4000**. You don’t need to open any router ports: your phone reaches it
-over Tailscale.
+**4000**. No router ports are needed: the phone reaches it over
+Tailscale.
 
 > [!WARNING]
 >
@@ -117,7 +116,7 @@ over Tailscale.
 
 ### Step 5: Connect from the phone by name
 
-Install the **NoMachine** app on your phone, then add a connection:
+Install the **NoMachine** app on the phone, then add a connection:
 
 - **Host:** the machine’s Tailscale name, e.g. `desktop` (or its
   `100.x.y.z`).
@@ -134,8 +133,8 @@ Part A instead.
 
 - **Name every machine** clearly on the Tailscale Machines page so the
   rest is just typing a name.
-- **Termius** gives you an SSH terminal from your phone, addressed by
+- **Termius** gives you an SSH terminal from a phone, addressed by
   Tailscale name, with key auth, the right tool for the headless Pi.
-- **NoMachine** gives you a full remote desktop from your phone, for
-  machines that actually run a desktop, over the tailnet with nothing
-  exposed to the internet.
+- **NoMachine** gives you a full remote desktop from a phone, for
+  machines that run a desktop, over the tailnet with nothing exposed to
+  the internet.

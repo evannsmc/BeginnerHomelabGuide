@@ -1,24 +1,24 @@
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 
 # Chapter 1. Foundation: your Raspberry Pi and your Tailscale network
 
 > **The payoff of this chapter:** an always-on Raspberry Pi that’s ready
 > to host everything in this series, running Docker, hardened SSH, and
-> joined to a private Tailscale network, plus your laptop and iPhone on
-> that same network, so every machine can reach every other by name,
+> joined to a private Tailscale network, plus a laptop/desktop and phone
+> on that same network, so every machine can reach every other by name,
 > from anywhere, with nothing exposed to the public internet.
 
 This is the groundwork the rest of the book stands on. We don’t install
 any “app” here, instead we build the platform: a Pi that’s online,
 secured, and addressable, and a **tailnet** (your private Tailscale
 network) that stitches your devices together. Every later chapter
-(Audiobookshelf, Pi-hole, the dashboard, the VPN) simply plugs into what
-you set up now.
+(Audiobookshelf, Pi-hole, the dashboard, the VPN) plugs into this
+foundation.
 
 ## Why Tailscale is the spine of everything
 
@@ -53,8 +53,9 @@ corporate Wi-Fi.
   and a 16 GB+ card).
 - A **laptop/desktop** (Linux assumed; the commands use `apt`/`systemd`)
   to flash the card and to use as a client.
-- An **iPhone** (the apps used later also exist for Android; commands
-  are identical).
+- A **phone**. The examples show an iPhone because that is what I have
+  for testing; Android equivalents exist for the apps used here unless a
+  chapter says otherwise.
 - A **free Tailscale account**, sign up with Google/GitHub/Microsoft or
   email at <https://tailscale.com>. One account, signed into on every
   device, is the only “server” you need.
@@ -180,16 +181,16 @@ curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up        # sign in with the SAME account
 ```
 
-Your tailnet is one shared namespace, signing in with the same account
-simply adds the laptop as another peer. From now on you can
-`ssh you@homelab` from the laptop over the tailnet, anywhere.
+The tailnet is one shared namespace; signing in with the same account
+adds the laptop as another peer. From now on you can `ssh you@homelab`
+from the laptop over the tailnet, anywhere.
 
-### Step 6: Install Tailscale on iPhone
+### Step 6: Install Tailscale on the example phone
 
-Install **Tailscale** from the App Store and sign in with the same
-account. You should see `homelab` (and your laptop) listed as peers.
-That’s it, the phone is now on the mesh and can reach the Pi by name, on
-Wi-Fi or cellular.
+Install **Tailscale** from the phone’s app store and sign in with the
+same account. The phone should show `homelab` (and the laptop/desktop)
+as peers. That’s it, the phone is now on the mesh and can reach the Pi
+by name, on Wi-Fi or cellular.
 
 ### Step 7: Verify the mesh
 
@@ -197,7 +198,7 @@ From the Pi (or your laptop):
 
 ``` bash
 tailscale status        # lists every device with a green marker when online
-ping homelab            # from the laptop/phone, resolves via MagicDNS
+ping homelab            # from another tailnet device, resolves via MagicDNS
 ssh homelab             # from your laptop, log straight in by name
 ```
 
@@ -207,8 +208,8 @@ as your laptop username matches the one on the Pi; if it differs, use
 `ssh you@homelab`. The first connection may ask you to confirm the host
 fingerprint, which is normal.)
 
-If `homelab` resolves, `tailscale status` shows your laptop and phone
-online, and `ssh homelab` logs you in, the foundation is done.
+If `homelab` resolves, `tailscale status` shows the laptop/desktop and
+phone online, and `ssh homelab` logs you in, the foundation is done.
 
 > [!TIP]
 >
@@ -225,11 +226,11 @@ online, and `ssh homelab` logs you in, the foundation is done.
 - **Flashed** a headless 64-bit Linux (Ubuntu Server 26.04 LTS) with
   key-only SSH (no passwords, no open ports).
 - **Installed Docker** on the Pi, the runtime for every later service.
-- **Built your tailnet:** the Pi, your laptop, and your phone all on one
-  private WireGuard mesh, signed into one account.
+- **Built the tailnet:** the Pi, a laptop/desktop, and a phone all on
+  one private WireGuard mesh, signed into one account.
 - **Named the Pi `homelab`** via MagicDNS, so everything is reachable by
   name.
 
 The platform is ready. In [Chapter 2](../02-audiobookshelf/README.md) we
-put it to work: ripping your Assimil discs and serving them from the Pi
-to your phone over the tailnet you just built.
+put it to work: ripping my Assimil discs as the working example, then
+serving audio from the Pi to a phone over the tailnet.

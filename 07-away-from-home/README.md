@@ -1,54 +1,48 @@
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 
-# Chapter 7. Exit nodes, the Mullvad add-on, and what I actually run
+# Chapter 7. Exit nodes, the Mullvad add-on, and what I run
 
-> **The payoff of this chapter:** the one rule that governs VPNs on the
-> road, the honest setup I actually live with (a standalone Mullvad I
+> **The payoff of this chapter:** the routing rule that governs VPNs on
+> the road, the setup I use (a standalone Mullvad account that I can
 > switch on and off, giving up homelab access while it’s on), what a
 > Tailscale **exit node** is, and the paid add-on that *can* give you
 > privacy and your homelab at the same time, if you’re willing to trade
 > control and a few more dollars for it.
 
-At home, everything is easy: your devices share the Pi’s network and
-everything just works. The moment you walk out the door, the only thing
-connecting your phone to your Pi is **Tailscale**. This part is the
-field manual for that world, and it picks up right where [Chapter
-6](../06-vpn/README.md) left off: you’ve chosen *which* VPN you want
-(Mullvad, for its openness); now we deal with how it actually coexists
-with the homelab.
+At home, the pieces share the Pi’s network. Away from home,
+**Tailscale** is the link back to the Pi. This part picks up where
+[Chapter 6](../06-vpn/README.md) left off: the VPN choice is made; now it
+has to coexist with the homelab.
 
 ## Reaching your homelab from anywhere (the easy part)
 
-This one already works, and it’s the cleanest win. Because Tailscale is
-a mesh VPN, any device signed into your tailnet reaches the Pi from
-anywhere, coffee shop, cellular, hotel, with no extra setup:
+This part already works. Because Tailscale is a mesh VPN, any device
+signed into the tailnet reaches the Pi from anywhere, coffee shop,
+cellular, hotel, with no extra setup:
 
 - **Audiobookshelf:** `https://abs.home` streams just as it does at
   home.
 - **The dashboard:** `https://home.home` (or `https://homelab`) opens
   from anywhere.
 
-The reason it’s effortless is that you’re only reaching *into* your own
-network over an authenticated tunnel. The hard parts below are all about
-the *outbound* direction, what your traffic does and which DNS resolves
-it.
+That is inbound access over an authenticated tunnel. The hard parts
+below are outbound: where traffic exits and which DNS resolver answers.
 
 ## Pi-hole already follows you (set up in Chapter 4)
 
-You don’t need to do anything here, when you made Pi-hole your tailnet’s
-DNS in [Chapter 4](../04-pretty-urls/README.md) (the **Override local
-DNS** setup), you also got Pi-hole’s ad-blocking on every device,
-everywhere. On cellular, your phone still resolves through Pi-hole, so
-ads stay blocked. The same step is also what makes your `.home` names
-work away from home.
+No extra setup is needed here. When Pi-hole became the tailnet DNS in
+[Chapter 4](../04-pretty-urls/README.md) (the **Override local DNS**
+setup), Pi-hole ad-blocking came with it on every tailnet device. On
+cellular, the phone still resolves through Pi-hole, so ads stay blocked.
+The same step is also what makes your `.home` names work away from home.
 
-That’s the good news. The catch is what happens when you turn on
-*another* VPN, which is the rest of this chapter.
+The conflict starts when another VPN is turned on, which is the rest of
+this chapter.
 
 > [!IMPORTANT]
 >
@@ -61,8 +55,7 @@ That’s the good news. The catch is what happens when you turn on
 
 ## The one rule that governs everything off-network
 
-Here it is, the rule that explains every “why can’t I just…” on the
-road:
+The road setup follows this rule:
 
 > **A full-device VPN owns the default route *and* the DNS, and a device
 > runs only one such VPN at a time.**
@@ -71,9 +64,9 @@ Two consequences fall out of it:
 
 1.  **A privacy VPN and Tailscale can’t both be the active tunnel.**
     Phones make this a hard wall: iOS and Android allow exactly one
-    active VPN, so turning on Mullvad (or Aura) drops Tailscale. But,
-    and this surprised me, **the same thing bites on a laptop in
-    practice.** A Mullvad WireGuard tunnel grabs the entire default
+    active VPN, so turning on Mullvad (or Aura) drops Tailscale. I ran
+    into the same problem on a laptop, for a different reason:
+    **routing.** A Mullvad WireGuard tunnel grabs the entire default
     route, which swallows the path back to your tailnet, so the moment
     Mullvad is up, `https://homelab` and your `100.x` addresses go dark
     there too. The phone enforces “one VPN” by policy; the laptop
@@ -84,23 +77,25 @@ Two consequences fall out of it:
     traffic is *not* going through Pi-hole, by design, to prevent DNS
     leaks.
 
-`★ Insight ─────────────────────────────────────` This is why “use my
-own VPN *and* filter through Pi-hole *and* reach my homelab, all at
-once, on one device” has no clean answer with two separate apps: Pi-hole
-and your homelab live only on your tailnet, reaching them needs
-Tailscale to be the active tunnel, and a privacy VPN that’s up takes
-that role (by policy on a phone, by routing on a laptop). The only real
-escapes are to put the privacy VPN and your homelab on the *same
-tunnel*, which is the exit-node idea further down, or to simply switch
-between them, which is what I do.
-`─────────────────────────────────────────────────`
+> [!NOTE]
+>
+> ### Why two VPN apps don’t give you everything at once
+>
+> This is why “use my own VPN *and* filter through Pi-hole *and* reach
+> my homelab, all at once, on one device” has no clean answer with two
+> separate apps: Pi-hole and your homelab live only on your tailnet,
+> reaching them needs Tailscale to be the active tunnel, and a privacy
+> VPN that’s up takes that role (by policy on a phone, by routing on a
+> laptop). The only real escapes are to put the privacy VPN and your
+> homelab on the *same tunnel*, which is the exit-node idea further
+> down, or to switch between them, which is what I do.
 
-## What I actually run: keep them separate, switch per activity
+## What I run: keep them separate, switch per activity
 
 After trying to have it all at once and losing (see the sidebar), I
-settled on the setup that’s boring and bulletproof: **I keep a
-standalone Mullvad subscription and Tailscale installed side by side,
-and I only ever run one at a time.** On both my laptop and my phone.
+settled on the setup that has held up for me: **I keep a standalone
+Mullvad subscription and Tailscale installed side by side, and I only
+ever run one at a time.** On both my laptop and my phone.
 
 In practice that means I segregate my activities into two modes and flip
 between them in a couple of seconds:
@@ -111,15 +106,14 @@ between them in a couple of seconds:
   showing.
 - **Mullvad on, Tailscale off (when privacy matters).** Sketchy Wi-Fi,
   or I want to change region or hide my IP. While it’s on I accept that
-  the homelab and Pi-hole are simply *gone* for that stretch, Mullvad
+  the homelab and Pi-hole are unavailable for that stretch, Mullvad
   carries my DNS and its own ad-blocking instead. When I’m done, Mullvad
   off, Tailscale back on.
 
-That’s the whole system. No exit node, no policy routing, no add-on. The
-honest downside is right there in the open: **I can’t reach my homelab
-while the privacy VPN is on**, so I plan around it (do the private
-thing, then switch back to grab something off the Pi). For me that beats
-the alternatives, because I keep full control of my own Mullvad
+My setup is intentionally plain. No exit node, no policy routing, no
+add-on. The downside is right there in the open: **I can’t reach my
+homelab while the privacy VPN is on**, so I plan around it. For me that
+beats the alternatives, because I keep full control of my own Mullvad
 subscription, its config files, its settings, and I’m not paying for
 anything extra.
 
@@ -127,8 +121,8 @@ anything extra.
 >
 > ### I tried hard to have both on one box, and couldn’t make it stick
 >
-> Before settling on switch-per-activity, I spent real hours trying to
-> run Mullvad and Tailscale *simultaneously* on my laptop. The
+> Before settling on switch-per-activity, I spent hours and hours trying
+> to run Mullvad and Tailscale *simultaneously* on my laptop. The
 > approaches, and why each fell over:
 >
 > - **Split tunneling / carving out the tailnet.** Mullvad’s WireGuard
@@ -142,9 +136,8 @@ anything extra.
 > I could occasionally get a fragile version working, but never one that
 > survived a reconnect, a Mullvad server change, or a reboot. It was
 > never reliable enough to trust. The lesson I took: with two separate
-> full-device VPN apps, having both *truly* on at once is a fight you’ll
-> keep losing. If you want both at the same time and reliably, you don’t
-> fight the routing, you change the architecture, and that’s the
+> full-device VPN apps, having both on at once is not a stable setup. If
+> you want both at the same time, change the architecture; that’s the
 > exit-node add-on below.
 
 ## The thing that *would* let you have both: an exit node
@@ -173,18 +166,18 @@ tailscale set --exit-node=<node>         # route everything through it
 tailscale set --exit-node=               # turn it back off
 ```
 
-The trick: because an exit node *is* still Tailscale, choosing one
-doesn’t drop your tailnet. Your homelab stays reachable while your
-traffic exits somewhere else. That’s the one architecture that escapes
-the one-rule trap, and it comes in three flavors.
+Because an exit node *is* still Tailscale, choosing one doesn’t drop
+your tailnet. Your homelab stays reachable while your traffic exits
+somewhere else. That architecture escapes the one-rule trap, and it
+comes in three flavors.
 
 ## Flavor 1 (the upgrade path): the Tailscale Mullvad add-on
 
 This is the option that buys you privacy *and* your homelab at the same
 time, and it’s the thing I’d reach for if my needs grow. Tailscale sells
 access to **Mullvad’s worldwide WireGuard servers as a paid add-on
-purchased through Tailscale**. Mullvad’s servers simply appear as
-selectable exit nodes inside your tailnet:
+purchased through Tailscale**. Mullvad’s servers appear as selectable
+exit nodes inside the tailnet:
 
 ``` bash
 tailscale exit-node list                  # Mullvad cities now appear here
@@ -194,9 +187,9 @@ tailscale set --exit-node=<mullvad-node>  # exit through Mullvad, stay on Tailsc
 On **iOS / macOS / Android**: the `•••` menu → **Use exit node** → pick
 a Mullvad **location**. Because it’s still Tailscale, your homelab and
 `.home` names keep working while your traffic exits through Mullvad.
-That’s the genuine best of both worlds: always-on privacy that doesn’t
-cost you the homelab, and it’s the only option that works cleanly on a
-phone without fighting the one-VPN rule.
+That gives you both pieces: always-on privacy that doesn’t cost you the
+homelab, and it’s the only option that works cleanly on a phone without
+fighting the one-VPN rule.
 
 So why don’t I run it? Because of what you give up:
 
@@ -212,15 +205,18 @@ So why don’t I run it? Because of what you give up:
   *own and control* their Mullvad config (which is the whole reason
   Chapter 6 pointed at Mullvad), that’s a real loss.
 
-`★ Insight ─────────────────────────────────────` It comes down to
-convenience versus control. The add-on gives you *convenience* (one
-tunnel, always on, homelab intact). Owning your own Mullvad sub gives
-you *control* (portable configs, full settings, no extra account you
-don’t manage). Right now I value control more, and I’m fine switching
-apps by hand to get it. If my needs shift toward “always-on privacy that
-never costs me the homelab,” I’ll pay the extra and run both, or move
-fully to the add-on. It’s a budget-and-priorities call, not a
-right-or-wrong one. `─────────────────────────────────────────────────`
+> [!NOTE]
+>
+> ### Convenience versus control
+>
+> It comes down to convenience versus control. The add-on gives you
+> *convenience* (one tunnel, always on, homelab intact). Owning your own
+> Mullvad sub gives you *control* (portable configs, full settings, no
+> extra account you don’t manage). Right now I value control more, and
+> I’m fine switching apps by hand to get it. If my needs shift toward
+> “always-on privacy that never costs me the homelab,” I’ll pay the
+> extra and run both, or move fully to the add-on. It’s a
+> budget-and-priorities call, not a right-or-wrong one.
 
 When you *do* use a Mullvad exit node, two flags matter on the road:
 
@@ -273,7 +269,7 @@ IPv6 equivalent); the script sets both.
 
 ## Flavor 3 (advanced): a Pi-style exit node chained through Mullvad
 
-Flavor 2 hides nothing, because the box exits from your own IP. You can
+Flavor 2 hides nothing, because the box exits from the home IP. You can
 fix that by *chaining*: run an exit node that itself tunnels out through
 a standalone Mullvad **WireGuard** config. Your devices reach the node
 over the tailnet, and the node forwards their traffic out through
@@ -306,6 +302,24 @@ Reach for this if you already pay for Mullvad, want to keep your own
 config, and enjoy the plumbing. For most people the add-on (Flavor 1)
 buys the same outcome with none of the routing surgery.
 
+## A router-level VPN might be another answer, but I can’t test it yet
+
+A friend with 10+ years of homelab experience recently pointed out
+another possible path: configure the **router itself** to connect to a
+VPN. In theory, that could move the privacy tunnel out of the
+phone/laptop app layer and into the network layer, which may avoid some
+of the conflicts in this chapter.
+
+I can’t validate that setup on my current hardware. My router’s firmware
+is too old and does not expose the VPN-client features needed to try it.
+He also doesn’t use Mullvad, so I don’t know yet whether this works
+cleanly with Mullvad’s WireGuard configs or whether it introduces a
+different set of routing or DNS problems.
+
+So treat this as a lead, not a recommendation: if your router supports
+acting as a WireGuard/OpenVPN client, it may be worth investigating. It
+is not part of the tested setup in this guide.
+
 ## The decision matrix
 
 You can’t have all three of {homelab access, Pi-hole filtering, privacy
@@ -327,7 +341,7 @@ traffic exits elsewhere, and the only one of those that also hides your
 IP is the paid Mullvad add-on. Two things the Yes/No columns gloss over:
 in the Mullvad rows your DNS goes to Mullvad, so Pi-hole is bypassed and
 you lean on Mullvad’s own ad-blocking instead; and “appear at home”
-hides nothing because you exit from your own home IP.
+hides nothing because traffic exits from the home IP.
 
 ## A practical everyday routine
 
@@ -345,7 +359,7 @@ For most people the comfortable default is simple, and it’s mine:
     (Flavor 1) and let a Mullvad exit node do both at once, or stand up
     a chained exit node (Flavor 3) if you’d rather keep your own config.
 
-## Recap: and the whole series in one breath
+## Recap: the whole series
 
 - **Reaching your homelab away** is the free win: Tailscale makes
   `homelab:13378` and `https://home.home` work from anywhere, no extra
@@ -371,6 +385,6 @@ switchable answer for privacy on the road. All of it private by default,
 over one Tailscale network, with nothing exposed to the public internet.
 
 That completes the core of the homelab. **Volume III** is the extras:
-getting your *phone and your Linux machines* to talk to each other for
-everyday remoting, file transfer, and clipboard sharing, starting with
-[Chapter 8](../08-remoting-phone/README.md).
+getting a *phone and Linux machines* to talk to each other for everyday
+remoting, file transfer, and clipboard sharing, starting with [Chapter
+8](../08-remoting-phone/README.md).

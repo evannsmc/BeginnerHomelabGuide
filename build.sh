@@ -70,10 +70,10 @@ EOF
 
 read -r -d '' BANNER <<'EOF' || true
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 EOF
 read -r -d '' BANNER_NONE <<'EOF' || true

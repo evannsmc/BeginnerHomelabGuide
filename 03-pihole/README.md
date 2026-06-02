@@ -1,8 +1,8 @@
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 
 # Chapter 3. Network-wide ad blocking at home with Pi-hole
@@ -21,11 +21,10 @@ Because it works at the DNS layer, it blocks ads in *every* app and
 browser at once, including places a browser extension can’t reach (smart
 TVs, mobile apps, in-game ads).
 
-This part is entirely about your **home network**. Pi-hole becomes the
-DNS server for your house, set once at the router so every device on
-your Wi-Fi inherits it automatically, no per-device tweaking, no remote
-access, no VPN to think about. Just clean DNS for everything under your
-roof.
+This chapter is about the home network, not remote access yet. Pi-hole
+becomes the DNS server for the house. Set it once in the router and
+every device on your Wi-Fi inherits it automatically: no per-device
+tweaking, no VPN decisions, just clean DNS under your roof.
 
 ## What you are building (and why this design)
 
@@ -36,9 +35,9 @@ The plan has two halves:
     server in your router, so every device that joins your Wi-Fi
     automatically uses it.
 
-That router-level step is what makes this effortless: you configure one
-setting in one place, and every current and future device on your home
-network is covered without touching any of them individually.
+That router-level step is the payoff: configure one setting in one
+place, and every current and future device on your home network is
+covered without touching any of them individually.
 
 ## Part A: Run Pi-hole on the Pi
 
@@ -149,10 +148,10 @@ sed -i "s|^PIHOLE_PASSWORD=.*|PIHOLE_PASSWORD=$(openssl rand -base64 18)|" .env
 >
 > The compose file below publishes Pi-hole’s ports on `${PIHOLE_IP}`
 > specifically (e.g. `192.168.1.50:53`) rather than on every interface.
-> Serving on the one LAN address you actually use is tidier and a little
-> safer, Pi-hole listens where it needs to and nowhere else. Make
-> `PIHOLE_IP` the **static or DHCP-reserved** address you reserved in
-> Step 2, so it never changes underneath you.
+> Serving on the one LAN address in use keeps Pi-hole listening where it
+> needs to and nowhere else. Make `PIHOLE_IP` the **static or
+> DHCP-reserved** address you reserved in Step 2, so it never changes
+> underneath you.
 
 **3. Create `compose.yaml`.**
 
@@ -213,6 +212,16 @@ docker compose up -d
 docker compose logs --tail 20      # watch it come up
 ```
 
+Script version, same order as the manual steps:
+
+``` bash
+03-pihole/scripts/01-free-port-53.sh
+03-pihole/scripts/02-create-env.sh
+03-pihole/scripts/03-create-compose.sh
+03-pihole/scripts/04-create-gitignore.sh
+03-pihole/scripts/05-start-pihole.sh
+```
+
 > [!NOTE]
 >
 > ### Why port 80 now, and why it moves to 8081 later
@@ -223,14 +232,14 @@ docker compose logs --tail 20      # watch it come up
 > that has to **own** port 80, because that’s the port a browser
 > connects to when you type a bare name like `pihole.home` with no
 > `:port`. Only one program can hold a host port, so the front door
-> (Caddy) gets 80 and Pi-hole’s web UI moves to **8081** then. You’ll
-> barely notice the number, since you’ll reach it as `pihole.home`
-> anyway. Why 8081 and not 8080? Counter-intuitively, **8080 is the most
-> common alternate HTTP port** (dev servers, lots of containers grab
-> it), so it’s the one most likely to be taken; 8081 is just one past
-> it. Until then, make sure nothing else holds port 80: Audiobookshelf
-> (Chapter 2) uses 13378 so it’s clear, but `sudo ss -tlpn | grep ':80'`
-> confirms it before `docker compose up`.
+> (Caddy) gets 80 and Pi-hole’s web UI moves to **8081** then. The
+> number mostly disappears once the URL is `pihole.home` anyway. Why
+> 8081 and not 8080? Counter-intuitively, **8080 is the most common
+> alternate HTTP port** (dev servers, lots of containers grab it), so
+> it’s the one most likely to be taken; 8081 is just one past it. Until
+> then, make sure nothing else holds port 80: Audiobookshelf (Chapter 2)
+> uses 13378 so it’s clear, but `sudo ss -tlpn | grep ':80'` confirms it
+> before `docker compose up`.
 
 ### What the key settings do
 
@@ -299,12 +308,12 @@ cd ~/pihole && docker compose up -d --force-recreate
 ### Step 5: Point your home network at Pi-hole
 
 This is the centerpiece. You want every device in the house to use
-Pi-hole as its DNS server without configuring each one. The cleanest way
-is to set it **once at your router**, because the router hands out DNS
+Pi-hole as its DNS server without configuring each one. The usual way is
+to set it **once at your router**, because the router hands out DNS
 settings to every device via DHCP when they join the Wi-Fi.
 
 1.  Use the Pi’s reserved LAN IP from Step 2 (e.g. `192.168.1.50`).
-    That’s the address every device will be told to use for DNS.
+    Every device will be told to use that address for DNS.
 2.  In the router’s settings, find the **DNS server** field, usually
     under *DHCP*, *LAN*, or *Internet* settings, and set the **primary
     DNS** to the Pi’s IP (e.g. `192.168.1.50`).

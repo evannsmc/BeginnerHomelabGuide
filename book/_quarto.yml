@@ -4,7 +4,7 @@ project:
 
 book:
   title: "Beginner Homelab on a Raspberry Pi"
-  subtitle: "Self-host your media, block ads network-wide, get a one-URL control panel, reach everything from your phone, and route your devices through a VPN, all over a private Tailscale network"
+  subtitle: "Self-host your media, block ads network-wide, get a one-URL control panel, reach it from mobile devices, and route traffic through a VPN, all over a private Tailscale network"
   author: "Evanns Morales-Cuadrado"
   date: today
   search: true
@@ -18,7 +18,7 @@ book:
         - chapter-3-pihole.qmd
         - chapter-4-pretty-urls.qmd
         - chapter-5-dashboard.qmd
-    - part: "Volume II: On the road and your devices"
+    - part: "Volume II: VPNs and remote access"
       chapters:
         - chapter-6-vpn.qmd
         - chapter-7-away-from-home.qmd

@@ -1,8 +1,8 @@
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 
 # Chapter 5. A one-URL dashboard at `https://home.home`
@@ -13,10 +13,11 @@
 > the single front door that ties everything together.
 
 Chapter 4 gave individual services clean names (`https://pihole.home`,
-`https://abs.home`). This part adds the *landing page* that gathers them
-in one place, plus a real management GUI, and it slots into the reverse
-proxy you built in Chapter 4 using the exact three-step pattern from the
-end of that chapter.
+`https://abs.home`). This chapter adds the page I want to open first:
+one dashboard for status and links, plus a real Docker management GUI
+when I need to touch containers directly. It reuses the reverse-proxy
+pattern you just built instead of introducing another way to expose
+things.
 
 We’ll install two complementary tools:
 
@@ -258,6 +259,15 @@ Apply the config (a plain restart re-reads these files):
 cd ~/dashboard && docker compose restart homepage
 ```
 
+Script version for the dashboard stack and config:
+
+``` bash
+05-dashboard/scripts/01-create-dashboard-compose.sh
+05-dashboard/scripts/02-create-dashboard-env.sh
+05-dashboard/scripts/03-create-homepage-config.sh
+05-dashboard/scripts/04-start-dashboard.sh
+```
+
 > [!WARNING]
 >
 > ### The Pi-hole v6 widget gotcha
@@ -292,6 +302,13 @@ cd ~/caddy && docker compose restart caddy
 **3. Add a Pi-hole Local DNS record** (Settings → Local DNS Records):
 `home.home` → your Pi’s Tailscale IP (`100.x.y.z`), exactly like the
 records you added in Chapter 4.
+
+Script version for the route and DNS record:
+
+``` bash
+05-dashboard/scripts/05-add-dashboard-caddy-route.sh
+05-dashboard/scripts/06-add-dashboard-dns-record.sh
+```
 
 > [!WARNING]
 >

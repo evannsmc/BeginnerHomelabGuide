@@ -1,22 +1,25 @@
 # Preface. What this series builds {.unnumbered}
 
-This is a beginner-friendly guide to standing up a small **homelab** on a
-Raspberry Pi, organized into two **volumes** of short chapters. You start by
-building a foundation, then give it one job at a time. By the end you have one
-always-on Pi that serves your media, cleans the ads off every device you own,
-hands you a single dashboard URL, lets you reach everything from your phone, and
-can route your traffic through a VPN. And *every* piece is reachable from anywhere
-over a private [Tailscale](https://tailscale.com) network with nothing exposed to
-the public internet.
+This is my public homelab guide: one Raspberry Pi, one private
+[Tailscale](https://tailscale.com) network, and a handful of useful services
+added one at a time. The specifics come from the hardware and devices I
+have access to, but the pattern is meant for anyone building a similar beginner
+homelab. No port forwarding, no public dashboard hanging off the internet, no
+mystery pile of commands you cannot reproduce later.
+
+By the end, following along gives you an always-on Pi that serves spoken audio,
+blocks ads for the house, provides one dashboard URL, works from mobile devices,
+and can route traffic through a VPN when that makes sense. The chapters
+are short on purpose: do one job, verify it, move on.
 
 ## Volume I: Building the homelab
 
 1. **[Foundation: your Pi and your Tailscale network](chapter-1-foundation.qmd).**
    Flash a headless 64-bit Linux with key-based SSH, install Docker, and put the
-   Pi, your laptop, and your phone on one private Tailscale network with MagicDNS,
+   Pi, a laptop/desktop, and a phone on one private Tailscale network with MagicDNS,
    reachable by name from anywhere.
 2. **[Streaming audiobooks with Audiobookshelf](chapter-2-audiobookshelf.qmd).**
-   Serve spoken audio from the Pi, streaming to your phone with proper resume
+   Serve spoken audio from the Pi, streaming to a phone with proper resume
    tracking. The running example is my own: a language course I ripped from CD so
    I can study from anywhere without carrying the discs.
 3. **[Network-wide ad blocking with Pi-hole](chapter-3-pihole.qmd).** Run Pi-hole
@@ -28,23 +31,23 @@ the public internet.
 5. **[A one-URL dashboard](chapter-5-dashboard.qmd).** Add Homepage and Portainer,
    slotted into Caddy at `https://home.home` as a single landing page.
 
-## Volume II: On the road and your devices
+## Volume II: VPNs and remote access
 
 6. **[Why a VPN, and Mullvad vs. a standard app like Aura](chapter-6-vpn.qmd).**
    What a VPN does, how a mainstream app (I started on Aura) differs from
    Mullvad, and why Mullvad's portable WireGuard configs are what let a VPN mesh
    with a homelab, so you can pick the right kind.
-7. **[Exit nodes, the Mullvad add-on, and what I actually run](chapter-7-away-from-home.qmd).**
+7. **[Exit nodes, the Mullvad add-on, and what I run](chapter-7-away-from-home.qmd).**
    The one rule for why homelab access, Pi-hole, and a privacy VPN can't all run
    at once with two apps, the switch-per-activity setup I live with, what a
    Tailscale exit node is, and the paid add-on that buys you both at once.
 
 ## Volume III: Extras
 
-8. **[Remoting into your machines from your phone](chapter-8-remoting-phone.qmd).**
+8. **[Remoting into machines from a phone](chapter-8-remoting-phone.qmd).**
    Reach your Pi's terminal (Termius) and a full desktop (NoMachine) from your
-   phone, by Tailscale machine name.
-9. **[Wiring your phone into your Linux machines](chapter-9-phone-linux.qmd).**
+   phone or tablet, by Tailscale machine name.
+9. **[Wiring a phone into Linux machines](chapter-9-phone-linux.qmd).**
    LocalSend and KDE Connect for file transfer and clipboard sharing over
    Tailscale, plus the USB fallback for bulk photo offload.
 
@@ -61,7 +64,7 @@ test.
   (8 GB RAM)** with a **32 GB microSD card**, in an **Argon ONE M.2 Aluminum
   case** (passive-plus-fan cooling, with an M.2 slot for a future SSD), on
   **Ubuntu Server 26.04 LTS (64-bit), headless** (no desktop, just SSH). That's
-  simply what I happen to use, and what these steps are written and tested on. You
+  what I happen to use, and what these steps are written and tested on. You
   don't need the exact same kit; anything similar (a Pi 4 or 5 with a few GB of
   RAM and a 16 GB+ card, on a Debian/Ubuntu base) will follow along. There's
   plenty of headroom here, since all the containers, configs, and a ripped audio
@@ -69,9 +72,9 @@ test.
 - **A laptop/desktop** (Linux assumed) to flash the card and use as a client.
 - **A free Tailscale account.** One account, signed into on every device, is the
   connective tissue for the entire series.
-- **A phone.** I use an **iPhone**, so the phone steps throughout show the iOS
-  apps; each one has an Android build with identical commands, so use your
-  platform's equivalent.
+- **A phone.** My examples use an **iPhone**, because that is the phone I have
+  for testing. The same apps have Android builds unless a chapter calls out an
+  iOS-specific limitation, so use the equivalent app for the reader's platform.
 - **Docker** on the Pi, installed once in Chapter 1, reused by every later chapter.
 - A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapters 6 and 7
   (both optional, ~$5/month each; Chapter 6 picks the kind of VPN and Chapter 7
@@ -84,11 +87,10 @@ test.
   `docker`.
 - Commands prefixed with `sudo` need administrator rights; the rest run as your
   normal user.
-- **The phone in the examples is an iPhone.** I use one, so every phone step
-  (Audiobookshelf, Tailscale, Termius, NoMachine, LocalSend) shows the iOS app,
-  and I write *iPhone* to mean "the phone in this example," not an assumption that
-  you own one. Each of those apps has an Android build with the same commands, so
-  swap in your platform's app wherever you see *iPhone*.
+- **The example phone is an iPhone.** I write from the device I can test:
+  Audiobookshelf, Tailscale, Termius, NoMachine, and LocalSend on iOS. That is
+  not an assumption about the reader's phone. Where the Android path differs, I
+  call it out; otherwise use the same app on the platform at hand.
 - **Placeholders, substitute your own.** Wherever you see a Tailscale address
   like `100.x.y.z`, run `tailscale ip -4` on that machine to get the real one.
   This guide names the Raspberry Pi `homelab` on the tailnet; its full DNS name
@@ -104,15 +106,22 @@ test.
   `hostname -I`, the router's on the back of the router or in its app). Whenever
   you see one of these, read it as "e.g." and use your own. The same goes for any
   bare LAN IP in a command or screenshot.
+- **Manual commands first, scripts beside them.** The guide shows the actual
+  files and commands so you can see what is happening. The chapter folders also
+  include numbered helper scripts (`01-...sh`, `02-...sh`, etc.) for the same
+  file-creation and startup steps if you would rather automate the copy/paste.
+  Those scripts are standalone: they write their files inline and do not depend
+  on the `compose/` reference files. Read a script before running it; it is
+  intentionally small enough to audit.
 
 ::: {.callout-note}
 ## Why Tailscale is the spine of this series
 Every part avoids port forwarding, dynamic DNS, and exposing services to the
 public internet. Instead, each service binds to the Pi and is reached over an
-authenticated WireGuard mesh. The practical upshot: your homelab is private by
-default, works on locked-down corporate Wi-Fi, and needs no router
-configuration. You sign in once per device and everything just finds
-everything else.
+authenticated WireGuard mesh. The result: your homelab is private by default,
+works on locked-down corporate Wi-Fi, and needs no router
+configuration. You sign in once per device and the names resolve over the
+tailnet.
 :::
 
 ::: {.callout-important}

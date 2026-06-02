@@ -1,8 +1,8 @@
 > [!NOTE]
-> Part of my personal homelab guide. The scripts in this folder are small, generic
-> helpers (update, install, make folders, start containers); the use-case-specific
-> steps live in the text below, not in a script. They reflect my own setup, so read
-> them before running and adapt as needed. See the [main README](../README.md).
+> Part of my personal homelab guide. The scripts in this folder mirror the numbered
+> setup steps in the chapter: create the example files, write local `.env` files,
+> and start/recreate containers. They reflect my own setup, so read them before
+> running and adapt as needed. See the [main README](../README.md).
 
 
 # Chapter 4. Pretty URLs: a reverse proxy + local DNS
@@ -13,13 +13,11 @@
 > addresses, no scheme to type. And a pattern you’ll reuse for every
 > service you add from here on.
 
-Right now you reach your two services awkwardly:
+Right now the setup works, but the URLs are ugly:
 `http://192.168.1.50/admin` for Pi-hole, `http://homelab:13378` for
-Audiobookshelf, an IP here, a port there. This part introduces the
-machinery that gives **every** service one clean name, starting with
-these two. When we add the dashboard in [Chapter
-5](../05-dashboard/README.md), it’ll slot into the same system in three
-lines.
+Audiobookshelf, an IP here, a port there. This chapter fixes that once
+and gives every service one clean name. When we add the dashboard in
+[Chapter 5](../05-dashboard/README.md), it drops into this same pattern.
 
 > [!IMPORTANT]
 >
@@ -172,6 +170,15 @@ Then recreate the container so the new ports and network take effect:
 cd ~/pihole && docker compose up -d --force-recreate
 ```
 
+Script version for Part A:
+
+``` bash
+04-pretty-urls/scripts/01-create-homelab-network.sh
+04-pretty-urls/scripts/02-create-audiobookshelf-network-compose.sh
+04-pretty-urls/scripts/03-create-pihole-network-compose.sh
+04-pretty-urls/scripts/04-recreate-networked-services.sh
+```
+
 > [!NOTE]
 >
 > ### Is listening on all interfaces safe?
@@ -205,7 +212,7 @@ cat > Caddyfile <<'EOF'
 # built-in certificate authority (no public CA issues certs for a private TLD).
 # Caddy then serves HTTPS on 443 and auto-redirects http:// -> https://. Once you
 # trust Caddy's local CA on your devices (Step 7), a bare `pihole.home` typed in
-# the browser just works: no scheme, no warning, real padlock.
+# the browser opens over HTTPS: no scheme, no warning, real padlock.
 
 pihole.home {
     tls internal
@@ -257,6 +264,14 @@ docker compose up -d
 docker compose logs --tail 20
 ```
 
+Script version for the Caddy files and startup:
+
+``` bash
+04-pretty-urls/scripts/05-create-caddyfile.sh
+04-pretty-urls/scripts/06-create-caddy-compose.sh
+04-pretty-urls/scripts/07-start-caddy.sh
+```
+
 Caddy listens on `0.0.0.0:80` and `0.0.0.0:443`, all interfaces,
 including the Pi’s Tailscale `100.x.y.z`, and reaches each backend by
 container name over the `homelab` network, so it ignores host port
@@ -277,6 +292,12 @@ the Pi’s **Tailscale** IP (`tailscale ip -4` on the Pi):
 |---------------|-------------|
 | `pihole.home` | `100.x.y.z` |
 | `abs.home`    | `100.x.y.z` |
+
+Or let the helper add both records:
+
+``` bash
+04-pretty-urls/scripts/08-add-local-dns-records.sh
+```
 
 > [!TIP]
 >
@@ -343,8 +364,8 @@ docker exec caddy cat /data/caddy/pki/authorities/local/root.crt \
 ```
 
 Now get that file onto each device. Since every device is already on
-your tailnet, the tidiest way is **Taildrop**, Tailscale’s built-in file
-send between your own machines, no AirDrop, no email, no cable:
+your tailnet, use **Taildrop**, Tailscale’s built-in file send between
+your own machines, no AirDrop, no email, no cable:
 
 ``` bash
 # from the Pi (or any machine that has the file), send to a peer by its name:
@@ -388,14 +409,14 @@ name works.
 >
 > ### Why a private CA instead of a real certificate
 >
-> A real, publicly-trusted certificate requires a domain **you own** and
-> a public CA (Let’s Encrypt) that can verify it, which can’t be done
-> for a private `.home` name. Caddy’s internal CA sidesteps that
-> entirely: it mints certificates locally and you tell *your* devices to
-> trust *that* CA. The trade-off is the one-time install above. (If you
-> ever buy a real domain, point a subdomain at the Pi and drop
-> `tls internal`, Caddy will fetch a real certificate automatically, and
-> you can remove the root cert from your devices.)
+> A real, publicly-trusted certificate requires a domain under the
+> reader’s control and a public CA (Let’s Encrypt) that can verify it,
+> which can’t be done for a private `.home` name. Caddy’s internal CA
+> sidesteps that entirely: it mints certificates locally and you tell
+> *your* devices to trust *that* CA. The trade-off is the one-time
+> install above. (If you ever buy a real domain, point a subdomain at
+> the Pi and drop `tls internal`, Caddy will fetch a real certificate
+> automatically, and you can remove the root cert from your devices.)
 
 ## The pattern you’ll reuse
 

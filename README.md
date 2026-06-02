@@ -1,7 +1,9 @@
 # Beginner Homelab on a Raspberry Pi 🏠🐳
 
 A friendly, **beginner-first** guide to building a small home server (a
-"homelab") on a Raspberry Pi. By the end you'll have one always-on Pi that:
+"homelab") on a Raspberry Pi, based on my own setup and written for other people
+who want to build something similar. By the end, following along gives you one
+always-on Pi that:
 
 - 📚 streams your **audiobooks / language courses** (Audiobookshelf),
 - 🛡️ **blocks ads** on every device in your house (Pi-hole),
@@ -20,29 +22,30 @@ This is my homelab, and this guide grows along with it.
 Right now I'm just getting started, so I only need one thing from it. I want
 remote access to the language-learning mp3s from my Assimil course, so I can
 study on my lunch break by bringing just the little book. No CDs to carry around
-(most laptops can't even play them anymore), no filling up my phone with audio
-files, and no wrestling a CD's contents onto an iPhone from a Linux machine. So
-the first job I gave my Pi was to hold those mp3s and stream them to my phone
+(most laptops can't even play them anymore), no filling up a phone with audio
+files, and no wrestling a CD's contents onto iOS from a Linux machine. So
+the first job I gave my Pi was to hold those mp3s and stream them to a phone
 from anywhere.
 
-That's the example the whole guide is built around. I picked it because it was
-actually useful to me, and a real need is easier to learn from than a made-up
+That example is the thread running through the guide. I picked it because it was
+useful to me, and a real need is easier to learn from than a made-up
 one. I'm not assuming you want the same thing. I'm just showing how I set up a
 homelab using the problem I had in front of me. As my homelab grows and changes,
 this guide will change with it, and I'll write up what I learn along the way,
 including the parts I got wrong.
 
 > [!IMPORTANT]
-> ### The scripts are small, generic helpers, built around my setup
-> Each folder holds a few **small, self-contained** scripts for the basic steps
-> only: updating the system, installing Docker and Tailscale, making folders, and
-> starting containers. They deliberately do **not** automate my use-case-specific
-> bits (like ripping and copying my own audio); those live in the guide text, not
-> in a script. The scripts still reflect the choices I made for my own homelab, so
-> read one before you run it and adapt it to your own hardware and needs.
+> ### The scripts mirror the numbered setup steps
+> Each folder holds small, self-contained scripts for the repeatable parts:
+> creating the example `compose.yaml` files, writing local `.env` files, writing
+> standalone config like the `Caddyfile`, and starting or recreating containers.
+> They deliberately do **not** automate my use-case-specific bits (like ripping
+> and copying my own audio); those live in the guide text. The scripts still
+> reflect the choices I made for my own homelab, so read one before you run it
+> and adapt it to your own hardware and needs.
 
 > [!NOTE]
-> ### What this is (and the honest caveats)
+> ### What this is, and the caveats
 > This is a **beginner** homelab, documented from a real build:
 > - **Hardware:** a **Raspberry Pi 4 Model B** with a **32 GB microSD card**.
 >   That's all, *so far*.
@@ -57,9 +60,11 @@ including the parts I got wrong.
 There's no one big installer. You **work through the guide chapter by chapter**.
 Each folder has a `README.md` (the walkthrough), a PDF of that chapter, a
 `scripts/` folder of small **numbered** helpers (run them in order), and, for the
-service chapters, a `compose/` folder with the actual `compose.yaml` / `Caddyfile`
-so you can either run the script **or copy the file by hand**. A typical flow on a
-freshly flashed, Tailscale-signed-in Pi (see [Chapter 1](01-foundation/README.md)):
+service chapters, a `compose/` folder with reference copies of the
+`compose.yaml` / `Caddyfile` for people doing the steps by hand. The scripts are
+standalone: they write their own files inline and do not depend on the
+`compose/` folder. A typical flow on a freshly flashed, Tailscale-signed-in Pi
+(see [Chapter 1](01-foundation/README.md)):
 
 ```bash
 git clone https://github.com/evannsmc/BeginnerHomelabGuide.git
@@ -93,7 +98,7 @@ The guide is two **volumes** of short chapters. Each chapter is grouped into
 | 4 | [04-pretty-urls](04-pretty-urls/README.md) | A Caddy reverse proxy + local DNS for `*.home` URLs (HTTPS) |
 | 5 | [05-dashboard](05-dashboard/README.md) | A one-URL dashboard (Homepage) + Docker GUI (Portainer) |
 
-**Volume II, on the road and your devices**
+**Volume II, VPNs and remote access**
 
 | Ch | Folder | What you build |
 |---|---|---|
@@ -104,8 +109,8 @@ The guide is two **volumes** of short chapters. Each chapter is grouped into
 
 | Ch | Folder | What you build |
 |---|---|---|
-| 8 | [08-remoting-phone](08-remoting-phone/README.md) | Reach your machines from your phone: Termius (SSH) + NoMachine (desktop) |
-| 9 | [09-phone-linux](09-phone-linux/README.md) | File + clipboard sharing between your phone and Linux |
+| 8 | [08-remoting-phone](08-remoting-phone/README.md) | Reach machines from a phone: Termius (SSH) + NoMachine (desktop) |
+| 9 | [09-phone-linux](09-phone-linux/README.md) | File + clipboard sharing between a phone and Linux |
 
 **Bonus reference:**
 [appendix-a-compose](appendix-a-compose/README.md) (every Docker Compose file
@@ -120,10 +125,15 @@ to verify it).
 ├── README.md                ← the full guide for this chapter (copy-paste friendly)
 ├── 04-pretty-urls.pdf       ← the same chapter as a standalone PDF
 ├── scripts/                 ← small numbered helpers, run in order
-│   ├── 01-attach-services-to-network.sh
-│   ├── 02-start-caddy.sh
-│   └── 03-add-local-dns-records.sh
-└── compose/                 ← the real files to grab (the scripts install these)
+│   ├── 01-create-homelab-network.sh
+│   ├── 02-create-audiobookshelf-network-compose.sh
+│   ├── 03-create-pihole-network-compose.sh
+│   ├── 04-recreate-networked-services.sh
+│   ├── 05-create-caddyfile.sh
+│   ├── 06-create-caddy-compose.sh
+│   ├── 07-start-caddy.sh
+│   └── 08-add-local-dns-records.sh
+└── compose/                 ← reference files to grab if you are doing it by hand
     ├── Caddyfile
     ├── caddy.compose.yaml
     ├── audiobookshelf.compose.yaml
@@ -132,21 +142,23 @@ to verify it).
 
 Every chapter follows this shape: a `scripts/` folder of small numbered helpers
 (`01-…`, `02-…`, in the order the chapter runs them), and, where the chapter has
-you create config, a `compose/` folder with the real `compose.yaml` / `Caddyfile`
-(and the Homepage `config/` for the dashboard), ready to copy by hand. The scripts
-just install those same files and start the containers, so there's one copy of
-each, no drift. Secrets stay out; an `.env.example` shows the shape where a `.env`
-is needed. (`07-away-from-home` and `08-remoting-phone` are reading / app-setup, so
-no scripts.) In the repo root:
+you create config, a `compose/` folder with reference `compose.yaml` /
+`Caddyfile` files (and the Homepage `config/` for the dashboard), ready to copy
+by hand. The scripts are standalone equivalents: they write matching files inline
+and then start the containers, so the manual path and script path stay aligned
+without requiring the `compose/` folder. Secrets stay out; an `.env.example`
+shows the shape where a `.env` is needed. (`08-remoting-phone` is reading / app
+setup, so no scripts.) In the repo root:
 
 - **[`Beginner-Homelab-on-a-Raspberry-Pi.pdf`](Beginner-Homelab-on-a-Raspberry-Pi.pdf)**.
   The entire guide as one book.
 
 ## 🔐 What the scripts cover vs. what you do by hand
 
-The helper scripts cover only the **basic, generic** steps (update, install
-Docker/Tailscale, make folders, start containers). Everything use-case-specific
-or interactive you do yourself, guided by each chapter's README:
+The helper scripts cover only the **repeatable** steps (update, install
+Docker/Tailscale, make folders, create compose/config files, create local `.env`
+files, start containers). Everything use-case-specific or interactive you do
+yourself, guided by each chapter's README:
 
 - **Flashing the SD card** (done on your laptop with Raspberry Pi Imager).
 - **Signing into Tailscale** (opens a browser sign-in) and **renaming the Pi**

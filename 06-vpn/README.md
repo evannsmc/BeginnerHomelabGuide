@@ -6,25 +6,25 @@
 
 # Chapter 6. Why a VPN, and Mullvad vs. a standard app like Aura
 
-> **The payoff of this chapter:** understand what a VPN actually does
-> for you, see how a mainstream consumer VPN (I started with Aura)
-> differs from a privacy-focused one (Mullvad), and come away knowing
-> *which kind* you want and why. The plumbing, how a VPN coexists with
-> your tailnet and your Pi-hole once you leave the house, is the whole
-> of [Chapter 7](../07-away-from-home/README.md); this chapter is just
-> about picking the right tool.
+> **The payoff of this chapter:** understand what a VPN does for you,
+> see how a mainstream consumer VPN (I started with Aura) differs from a
+> privacy-focused one (Mullvad), and decide which kind fits this
+> homelab. The plumbing, how a VPN coexists with the tailnet and Pi-hole
+> away from home, is the whole of [Chapter
+> 7](../07-away-from-home/README.md); this chapter is about choosing the
+> kind of VPN to build around.
 
 Everything so far has been about reaching *into* your homelab. This part
 is the opposite direction: making your devices’ traffic leave through a
 VPN, so the websites and apps you use can’t see your real IP address,
 and so your ISP or a café’s Wi-Fi can’t see what you’re doing.
 
-Maybe you already run a consumer VPN to change locations. I started with
-**Aura VPN**, and it’s a perfectly good one. The goal here isn’t to talk
-you out of whatever you run, it’s to lay out the landscape clearly: what
-a VPN does, what the familiar consumer app (Aura is my stand-in for the
-whole category) gives you, and where **Mullvad** is genuinely different,
-because that difference is the thing the *next* chapter builds on.
+Maybe a consumer VPN is already in the mix for changing locations. I
+started with **Aura VPN**, and it did that job well. I use Aura here as
+the stand-in for that whole category: NordVPN, ExpressVPN, and the other
+closed apps built around one big connect button. Mullvad matters in this
+guide because it can hand over plain WireGuard configs, which gives the
+homelab something to build with in the next chapter.
 
 ## What a VPN does (and what it doesn’t)
 
@@ -40,9 +40,8 @@ reaches the wider internet. Two practical consequences:
 What a VPN does *not* do: it isn’t anonymity (the VPN provider can see
 your traffic, so provider trust matters), and it doesn’t block ads by
 itself unless the provider offers DNS-level filtering. Hold onto that
-last point, because a VPN wanting to own your DNS is exactly the seam
-where it rubs against your Pi-hole, and that collision is the heart of
-Chapter 7.
+last point, because a VPN wanting to own your DNS is where it rubs
+against Pi-hole, and that collision is the heart of Chapter 7.
 
 ## The standard consumer VPN (Aura, and apps like it)
 
@@ -54,10 +53,10 @@ category (NordVPN, ExpressVPN, and friends behave the same way).
 
 What it does well:
 
-- **It is genuinely easy.** Install, sign in, tap a country, done. No
+- **It is easy to use.** Install, sign in, tap a country, done. No
   config files, no command line.
 - **It changes your location convincingly** and shields you on sketchy
-  Wi-Fi, which is the 90% use case most people actually have.
+  Wi-Fi, which is the common use case.
 - **It has split tunneling on its supported platforms**, so you can
   exempt chosen apps from the tunnel.
 
@@ -73,9 +72,9 @@ Where this category runs into walls for *our* purposes:
   normal and even desirable (it prevents DNS leaks), but it’s also
   precisely why it will fight your Pi-hole later.
 
-None of that makes Aura *bad*. It makes it a sealed appliance: great for
-“make me look like I’m in another country for an hour,” not built to be
-a Lego brick in a homelab.
+None of that makes Aura *bad*. It makes it a sealed appliance: useful
+for “make me look like I’m in another country for an hour,” not built to
+be reused by a Pi, VPS, or exit-node setup.
 
 ## Mullvad: the privacy-first alternative
 
@@ -84,7 +83,7 @@ Aura optimizes for a frictionless consumer experience, Mullvad optimizes
 for privacy and for *control*, and that control is the reason it keeps
 coming up in this guide.
 
-The concrete differences that matter:
+The points that pushed me toward it:
 
 - **A flat, anonymous price.** A flat **€5/month** (about \$5.40), up to
   5 devices, with no tiered “identity suite” wrapped around it. You can
@@ -98,31 +97,28 @@ The concrete differences that matter:
 - **Built-in DNS ad and tracker blocking**, which becomes a useful
   stand-in on the road when your traffic isn’t going through Pi-hole
   (see Chapter 7).
-- **It hands you the keys: WireGuard config files.** This is the big
-  one. Mullvad lets you download standard **WireGuard** configuration
-  files and run them *anywhere*, including on the headless Pi or a cheap
-  Linux VPS, with no Mullvad app at all. Aura gives you nothing like
-  this.
+- **It hands over WireGuard config files.** This is the feature I care
+  about most. Mullvad lets you download standard **WireGuard**
+  configuration files and run them *anywhere*, including on the headless
+  Pi or a cheap Linux VPS, with no Mullvad app at all. Aura gives you
+  nothing like this.
 
-That last point is the whole reason Mullvad, and not Aura, threads
-through the rest of the series. A VPN you can express as a portable
-WireGuard config is a VPN you can wire into other machines, which is
-exactly what Chapter 7’s exit-node tricks depend on. The trade is real,
-though: you give up some of Aura’s hand-holding polish for plumbing you
-assemble yourself.
+That last point is why Mullvad, not Aura, threads through the rest of
+the series. A portable WireGuard config can run on another machine,
+which is what the exit-node setups in Chapter 7 need. The trade is real:
+less hand-holding, more plumbing to assemble yourself.
 
 > [!NOTE]
 >
-> ### Aura vs. Mullvad, in one breath
+> ### Aura vs. Mullvad
 >
-> **Aura** (and consumer VPNs like it) is a sealed, easy app: tap a
-> country, you’re done, but it’s app-only, closed, and can’t leave its
-> own walls. **Mullvad** is the privacy-first, control-first option: a
-> flat anonymous price, a real kill switch, no-logs by design, and,
-> crucially, **portable WireGuard config files you can run on any
-> machine**. For casual location-changing, either is fine. For anything
-> that has to mesh with a homelab, Mullvad’s openness is what makes it
-> possible.
+> **Aura** (and consumer VPNs like it) is a sealed app: tap a country
+> and connect, but it stays inside the vendor’s client. **Mullvad** is
+> the privacy-first, control-first option: a flat anonymous price, a
+> real kill switch, no-logs by design, and **portable WireGuard config
+> files you can run on any machine**. For casual location-changing,
+> either is fine. For a VPN that needs to mesh with a homelab, Mullvad
+> is the useful shape.
 
 ## Which one should you want?
 
@@ -134,9 +130,9 @@ that; it can only protect the one device its app runs on.
 
 Still, keep some perspective:
 
-- If all you ever want is “look like I’m in another country on my phone
-  for an hour,” a consumer app like Aura is genuinely fine, and you can
-  stop here.
+- If all you ever want is “look like I’m in another country on a phone
+  for an hour,” a consumer app like Aura is fine, and this chapter is
+  enough.
 - If you want the VPN to become *part of the homelab*, always-on privacy
   that still lets you reach your Pi, or a private exit you control, you
   want Mullvad’s openness, and you want Chapter 7.
@@ -150,14 +146,12 @@ Still, keep some perspective:
   can’t run on the Pi or be reused elsewhere.
 - **Mullvad** is the privacy-first, control-first alternative: flat
   anonymous pricing, a real kill switch, no-logs by design, built-in DNS
-  filtering, and, the decisive feature, **portable WireGuard config
-  files you can run anywhere**.
+  filtering, and **portable WireGuard config files you can run
+  anywhere**.
 - **For a homelab, prefer Mullvad**, not mainly for the privacy slogans
   but because its config files are building blocks; a consumer app is a
   dead end the moment you want the VPN to mesh with anything else.
 
-You now know *which kind* of VPN you want and why. The harder, more
-interesting question, how that VPN coexists with your tailnet and your
-Pi-hole once you walk out the door, what an **exit node** is, and what I
-actually run day to day, is next, in [Chapter
-7](../07-away-from-home/README.md).
+Next is the harder part: how that VPN coexists with the tailnet and
+Pi-hole away from home, what an **exit node** is, and what I run day to
+day. That’s [Chapter 7](../07-away-from-home/README.md).
