@@ -127,8 +127,8 @@ that's the exit-node add-on below.
 ## The thing that *would* let you have both: an exit node
 
 Everything above assumes two separate VPN apps. There's a different architecture
-that sidesteps the whole "one tunnel at a time" problem, and it's worth
-understanding even if (like me) you don't use it yet.
+that sidesteps the whole "one tunnel at a time" problem, and it's good to know
+even if, like me, you don't use it yet.
 
 Normal Tailscale is an **overlay network**: it only carries traffic *between*
 your own devices (laptop ↔ `homelab` ↔ phone). Your ordinary internet traffic
@@ -148,7 +148,7 @@ tailscale set --exit-node=<node>         # route everything through it
 tailscale set --exit-node=               # turn it back off
 ```
 
-The key insight: because an exit node *is* still Tailscale, choosing one doesn't
+The trick: because an exit node *is* still Tailscale, choosing one doesn't
 drop your tailnet. Your homelab stays reachable while your traffic exits
 somewhere else. That's the one architecture that escapes the one-rule trap, and
 it comes in three flavors.
@@ -186,7 +186,7 @@ So why don't I run it? Because of what you give up:
   is the whole reason Chapter 6 pointed at Mullvad), that's a real loss.
 
 `★ Insight ─────────────────────────────────────`
-This is the honest trade at the center of the chapter. The add-on gives you
+It comes down to convenience versus control. The add-on gives you
 *convenience* (one tunnel, always on, homelab intact). Owning your own Mullvad
 sub gives you *control* (portable configs, full settings, no extra account you
 don't manage). Right now I value control more, and I'm fine switching apps by
@@ -279,18 +279,21 @@ You can't have all three of {homelab access, Pi-hole filtering, privacy VPN} on
 one device at one time with two separate apps. But you *can* switch between
 coherent modes in seconds. Pick per situation:
 
-| You're away and you want… | Set this | Pi-hole? | Homelab? | Hides IP? |
-|---|---|---|---|---|
-| **Homelab + ad-blocking** (my everyday default) | Tailscale on, no exit node | ✅ via DNS push | ✅ | ❌ (your real IP) |
-| **Privacy, my way** (what I run) | Tailscale off, **standalone Mullvad on** | ❌ Mullvad's DNS | ❌ | ✅ |
-| **Appear at home / reach LAN** | Tailscale + **Pi as exit node** (Flavor 2) | ✅ | ✅ | ❌ (home IP) |
-| **Privacy *and* homelab at once** | **Mullvad add-on exit node** (Flavor 1) | ❌ Mullvad's DNS | ✅ | ✅ |
+| You're away and you want… | What you turn on | Pi-hole? | Homelab? | Hides IP? |
+|:---|:---|:---:|:---:|:---:|
+| **Homelab + ad-blocking** (my default) | Tailscale on, no exit node | Yes | Yes | No |
+| **Privacy, my way** (what I run) | Mullvad on, Tailscale off | No | No | Yes |
+| **Appear at home / reach LAN** | Tailscale + Pi exit node (Flavor 2) | Yes | Yes | No |
+| **Privacy *and* homelab at once** | Mullvad add-on exit node (Flavor 1) | No | Yes | Yes |
 
 The pattern to read out of that table: with two separate apps (rows 1 and 2) you
 trade the whole homelab for privacy and switch between them, which is cheap,
 fully under your control, and what I do. The exit-node rows (3 and 4) are the only
 ways to keep the homelab *while* your traffic exits elsewhere, and the only one of
-those that also hides your IP is the paid Mullvad add-on.
+those that also hides your IP is the paid Mullvad add-on. Two things the Yes/No
+columns gloss over: in the Mullvad rows your DNS goes to Mullvad, so Pi-hole is
+bypassed and you lean on Mullvad's own ad-blocking instead; and "appear at home"
+hides nothing because you exit from your own home IP.
 
 ## A practical everyday routine
 

@@ -116,7 +116,7 @@ config is what lets a VPN live on your Pi, on a VPS, or inside Tailscale itself.
 A sealed consumer app like Aura can never do that; it can only protect the one
 device its app runs on.
 
-That said, keep your perspective honest:
+Still, keep some perspective:
 
 - If all you ever want is "look like I'm in another country on my phone for an
   hour," a consumer app like Aura is genuinely fine, and you can stop here.

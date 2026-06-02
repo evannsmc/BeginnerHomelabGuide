@@ -125,11 +125,11 @@ you leave the house, the full reasoning is in [Chapter
 7](../07-away-from-home/README.md):
 
 | Mode (away) | Homelab URLs? | Pi-hole ad-block? | Hides your IP? |
-|----|----|----|----|
-| **Tailscale on, no exit node** (everyday default) | ✅ | ✅ | ❌ |
-| **Tailscale + your Pi as exit node** | ✅ | ✅ | ❌ (home IP) |
-| **Tailscale + Mullvad exit node** | ✅ | ❌ (Mullvad DNS) | ✅ |
-| **Aura (or any standalone VPN) on** | ❌ | ❌ | ✅ |
+|:---|:---|:---|:---|
+| **Tailscale on, no exit node** (everyday default) | Yes | Yes | No |
+| **Tailscale + your Pi as exit node** | Yes | Yes | No (home IP) |
+| **Tailscale + Mullvad exit node** | Yes | No (Mullvad DNS) | Yes |
+| **Aura (or any standalone VPN) on** | No | No | Yes |
 
 The one rule behind the table: a phone runs **one** VPN at a time, and
 whatever VPN is active owns DNS. So homelab access, Pi-hole filtering,

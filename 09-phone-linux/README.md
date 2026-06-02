@@ -21,24 +21,20 @@ you’d reach for AirDrop and Handoff; on Linux you assemble the same
 conveniences from two small apps, plus one wired option you’ll rarely
 need.
 
-The important framing up front: **these are three different tools
-solving three different problems.** Don’t think “which one wins”, think
-“which job am I doing.”
+Get one thing straight first: **these are three different tools solving
+three different problems.** Don’t think “which one wins”, think “which
+job am I doing.”
 
 ## The two Wi-Fi tools, and why you want both
 
-| Job                             | LocalSend | KDE Connect |
-|:--------------------------------|:---------:|:-----------:|
-| Send files phone → Linux        |    ✅     |     ✅      |
-| Receive files Linux → phone     |    ✅     |     ✅      |
-| Share clipboard                 |    ❌     |     ✅      |
-| Phone battery on desktop        |    ❌     |     ✅      |
-| Media remote control            |    ❌     |     ✅      |
-| Mirror notifications to desktop |    ❌     |     ⚠️      |
-| SMS / run commands from desktop |    ❌     |     ⚠️      |
-| Dead-simple, one-purpose app    |    ✅     |     ❌      |
-
-⚠️ = Android-only; not available in KDE Connect on iPhone (see below).
+| Job                                     | LocalSend | KDE Connect  |
+|:----------------------------------------|:----------|:-------------|
+| Send / receive files                    | Yes       | Yes          |
+| Share clipboard                         | No        | Yes          |
+| Phone battery on desktop                | No        | Yes          |
+| Media remote control                    | No        | Yes          |
+| Mirror notifications, SMS, run commands | No        | Android only |
+| Dead-simple, one-purpose app            | Yes       | No           |
 
 > [!IMPORTANT]
 >
@@ -125,8 +121,9 @@ sudo apt install kdeconnect
 > - For an at-a-glance tray/battery indicator, add a **Waybar** “custom”
 >   module that calls `kdeconnect-cli`, or just keep `kdeconnect-app` a
 >   keybind away.
-> - Skip **GSConnect**, it’s a GNOME Shell extension and won’t help you
->   on Hyprland. Plain `kdeconnect` is the right choice here.
+> - Skip **GSConnect**, it’s a GNOME Shell extension and won’t help on a
+>   bare Wayland setup like this. Plain `kdeconnect` is the right choice
+>   here.
 
 ### Open the firewall
 
@@ -180,11 +177,11 @@ discovery entirely:
 
 ## Phone ↔ the headless Pi
 
-A caveat worth stating plainly: LocalSend and KDE Connect are
-**desktop** tools. Your Pi from Chapters 1–5 runs a **headless** server
-OS (Ubuntu Server 26.04 LTS), no graphical desktop, so neither app is
-the natural fit there. For moving a file between your phone and the Pi,
-you already have better, GUI-free paths:
+Keep one thing in mind here: LocalSend and KDE Connect are **desktop**
+tools. Your Pi from Chapters 1–5 runs a **headless** server OS (Ubuntu
+Server 26.04 LTS), no graphical desktop, so neither app is the natural
+fit there. For moving a file between your phone and the Pi, you already
+have better, GUI-free paths:
 
 - **Drop it into a service you already run.** Files you want *on* the Pi
   (more audiobooks, say) can go straight into
@@ -247,25 +244,22 @@ fusermount -u ~/iphone           # unmount when done
 > jailbreak, no full filesystem, that’s an Apple limitation, not a
 > missing package.
 
-## If I were setting up your machine
+## Where to start
 
-Given your stack (iPhone, Hyprland, Arch/Ubuntu, plus the Pi homelab)
-start with exactly two things:
+For most setups, begin with exactly two things:
 
 1.  **LocalSend** (the AirDrop replacement)
 2.  **KDE Connect** (clipboard + battery + files)
 
 …and nothing else. Add the Tailscale manual-IP pairing once you want
-these to work away from home. Then, *if* six months from now you find
-yourself saying “I wish I could pull my whole camera roll off over a
-cable,” install `libimobiledevice` + `ifuse`, and at that point you’ll
-understand exactly why you need them, instead of carrying tools you
-never touch.
+these to work away from home. Then, *if* months later you find yourself
+wanting to pull a whole camera roll off over a cable, install
+`libimobiledevice` + `ifuse` at that point, when you’ll know exactly why
+you need them, instead of carrying tools you never touch.
 
-For most people in 2026, Wi-Fi transfer (LocalSend / KDE Connect,
-extended over Tailscale) handles the overwhelming majority of phone ↔
-Linux moments. USB is a backup and a power-user tool, not a daily
-requirement.
+For most people, Wi-Fi transfer (LocalSend / KDE Connect, extended over
+Tailscale) handles the overwhelming majority of phone ↔ Linux moments.
+USB is a backup and a power-user tool, not a daily requirement.
 
 ## Recap: and the series, complete
 
