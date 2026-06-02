@@ -27,20 +27,22 @@ solving three different problems.** Don’t think “which one wins”, think
 
 ## The two Wi-Fi tools, and why you want both
 
-| Job | LocalSend | KDE Connect (on iPhone) |
-|----|----|----|
-| Send files phone → Linux | ✅ | ✅ |
-| Receive files Linux → phone | ✅ | ✅ |
-| Share clipboard | ❌ | ✅ |
-| Phone battery on desktop | ❌ | ✅ |
-| Media remote control | ❌ | ✅ |
-| **Mirror phone notifications to desktop** | ❌ | **❌ on iPhone** (Android-only) |
-| SMS / run commands from desktop | ❌ | **❌ on iPhone** (Android-only) |
-| Dead-simple, one-purpose app | ✅ | ❌ |
+| Job                             | LocalSend | KDE Connect |
+|:--------------------------------|:---------:|:-----------:|
+| Send files phone → Linux        |    ✅     |     ✅      |
+| Receive files Linux → phone     |    ✅     |     ✅      |
+| Share clipboard                 |    ❌     |     ✅      |
+| Phone battery on desktop        |    ❌     |     ✅      |
+| Media remote control            |    ❌     |     ✅      |
+| Mirror notifications to desktop |    ❌     |     ⚠️      |
+| SMS / run commands from desktop |    ❌     |     ⚠️      |
+| Dead-simple, one-purpose app    |    ✅     |     ❌      |
+
+⚠️ = Android-only; not available in KDE Connect on iPhone (see below).
 
 > [!IMPORTANT]
 >
-> ### The iPhone reality check (this is where most guides mislead you)
+> ### The iPhone reality check
 >
 > KDE Connect’s headline features, notification mirroring, replying to
 > texts from your desktop, running commands on the phone, are

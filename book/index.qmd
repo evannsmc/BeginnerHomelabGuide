@@ -30,12 +30,14 @@ the public internet.
 
 ## Volume II: On the road and your devices
 
-6. **[VPN privacy: Aura, Mullvad, and your options](chapter-6-vpn.qmd).** What a
-   VPN does, how a mainstream app (I use Aura) compares to Mullvad, and what a
-   Tailscale exit node is, so you can pick the approach that fits.
-7. **[On the road: homelab, Pi-hole, and VPN away from home](chapter-7-away-from-home.qmd).**
-   The field manual for leaving the house, and the one rule for why homelab
-   access, Pi-hole, and a privacy VPN can't all run at once.
+6. **[Why a VPN, and Mullvad vs. a standard app like Aura](chapter-6-vpn.qmd).**
+   What a VPN does, how a mainstream app (I started on Aura) differs from
+   Mullvad, and why Mullvad's portable WireGuard configs are what let a VPN mesh
+   with a homelab, so you can pick the right kind.
+7. **[Exit nodes, the Mullvad add-on, and what I actually run](chapter-7-away-from-home.qmd).**
+   The one rule for why homelab access, Pi-hole, and a privacy VPN can't all run
+   at once with two apps, the switch-per-activity setup I live with, what a
+   Tailscale exit node is, and the paid add-on that buys you both at once.
 
 ## Volume III: Extras
 
@@ -71,8 +73,9 @@ test.
   apps; each one has an Android build with identical commands, so use your
   platform's equivalent.
 - **Docker** on the Pi, installed once in Chapter 1, reused by every later chapter.
-- A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapter 6 (both
-  optional, ~$5/month; Chapter 6 helps you choose).
+- A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapters 6 and 7
+  (both optional, ~$5/month each; Chapter 6 picks the kind of VPN and Chapter 7
+  picks how it meets your homelab).
 
 ## Conventions used throughout
 

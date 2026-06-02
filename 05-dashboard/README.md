@@ -349,5 +349,6 @@ promptly.
 
 Your homelab now has a single, memorable front door. In [Chapter
 6](../06-vpn/README.md) we turn to privacy on the *outbound* side: what a
-VPN does, how Aura and Mullvad compare, and what a Tailscale *exit node*
-is.
+VPN does, and how a standard app like Aura compares to Mullvad, then
+[Chapter 7](../07-away-from-home/README.md) takes that VPN on the road and
+explains the Tailscale *exit node*.

@@ -28,7 +28,7 @@ appendix-a-compose-explained:appendix-a-compose
 appendix-b-verify:appendix-b-verify"
 
 # folders that ship helper scripts (these get the "scripts" banner)
-HAS_SCRIPTS="01-foundation 02-audiobookshelf 03-pihole 04-pretty-urls 05-dashboard 06-vpn 09-phone-linux"
+HAS_SCRIPTS="01-foundation 02-audiobookshelf 03-pihole 04-pretty-urls 05-dashboard 07-away-from-home 09-phone-linux"
 
 echo "==> Rendering the whole book (PDF) from book/"
 ( cd "$BOOK" && quarto render --to pdf >/dev/null )

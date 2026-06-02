@@ -330,4 +330,6 @@ The security timeout elapsed, `docker restart portainer` and reopen
 
 Your homelab now has a single, memorable front door. In
 [Chapter 6](chapter-6-vpn.qmd) we turn to privacy on the *outbound* side: what a VPN
-does, how Aura and Mullvad compare, and what a Tailscale *exit node* is.
+does, and how a standard app like Aura compares to Mullvad, then
+[Chapter 7](chapter-7-away-from-home.qmd) takes that VPN on the road and explains
+the Tailscale *exit node*.
