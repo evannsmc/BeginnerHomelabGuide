@@ -76,9 +76,7 @@ test.
   for testing. The same apps have Android builds unless a chapter calls out an
   iOS-specific limitation, so use the equivalent app for the reader's platform.
 - **Docker** on the Pi, installed once in Chapter 1, reused by every later chapter.
-- A Mullvad subscription *or* the Tailscale Mullvad add-on for Chapters 6 and 7
-  (both optional, ~$5/month each; Chapter 6 picks the kind of VPN and Chapter 7
-  picks how it meets your homelab).
+- **An optional VPN.** Chapter 6 picks the kind of VPN and Chapter 7 picks how it meets your homelab.
 
 ## Conventions used throughout
 
@@ -87,10 +85,8 @@ test.
   `docker`.
 - Commands prefixed with `sudo` need administrator rights; the rest run as your
   normal user.
-- **The example phone is an iPhone.** I write from the device I can test:
-  Audiobookshelf, Tailscale, Termius, NoMachine, and LocalSend on iOS. That is
-  not an assumption about the reader's phone. Where the Android path differs, I
-  call it out; otherwise use the same app on the platform at hand.
+- **The example phone is an iPhone.** Where the Android path differs, I try to
+  call it out as best I can.
 - **Placeholders, substitute your own.** Wherever you see a Tailscale address
   like `100.x.y.z`, run `tailscale ip -4` on that machine to get the real one.
   This guide names the Raspberry Pi `homelab` on the tailnet; its full DNS name

@@ -256,9 +256,10 @@ still giving you the always-on-plus-homelab shape. The shape of it:
    fiddliness is exactly the same fight I lost on the laptop, just moved to a box
    you can leave running, and it's the work the add-on saves you.
 
-Reach for this if you already pay for Mullvad, want to keep your own config, and
-enjoy the plumbing. For most people the add-on (Flavor 1) buys the same outcome
-with none of the routing surgery.
+I don't know if this would actually work, since I basically spent hours trying to
+make something very similar work on my RPi. I know that it's technically different
+since that RPi is my DNS server on my router and for tailscale and I guess that 
+makes it all more complicated, but I'm skeptical this would work.
 
 ## A router-level VPN might be another answer, but I can't test it yet
 
@@ -267,15 +268,15 @@ possible path: configure the **router itself** to connect to a VPN. In theory,
 that could move the privacy tunnel out of the phone/laptop app layer and into
 the network layer, which may avoid some of the conflicts in this chapter.
 
-I can't validate that setup on my current hardware. My router's firmware is too
-old and does not expose the VPN-client features needed to try it. He also
+I can't validate that setup on my current hardware. My router and its firmware are too
+old and do not expose the VPN-client features needed to try it. He also
 doesn't use Mullvad, so I don't know yet whether this works cleanly with
 Mullvad's WireGuard configs or whether it introduces a different set of routing
 or DNS problems.
 
-So treat this as a lead, not a recommendation: if your router supports acting as
-a WireGuard/OpenVPN client, it may be worth investigating. It is not part of the
-tested setup in this guide.
+So treat all of these things as a lead, not a recommendation: if your router supports
+acting as a WireGuard/OpenVPN client, it may be worth investigating.
+It is not part of the tested setup in this guide.
 
 ## The decision matrix
 

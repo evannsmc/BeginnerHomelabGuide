@@ -140,11 +140,11 @@ anything extra.
 > you want both at the same time, change the architecture; that’s the
 > exit-node add-on below.
 
-## The thing that *would* let you have both: an exit node
+# (Unverified by me) The thing that *would* let you have both: an exit node
 
 Everything above assumes two separate VPN apps. There’s a different
-architecture that sidesteps the whole “one tunnel at a time” problem,
-and it’s good to know even if, like me, you don’t use it yet.
+architecture that apparently sidesteps the whole “one tunnel at a time”
+problem, and it’s good to know even if, like me, you don’t use it yet.
 
 Normal Tailscale is an **overlay network**: it only carries traffic
 *between* your own devices (laptop ↔ `homelab` ↔ phone). Your ordinary
@@ -233,16 +233,6 @@ tailscale set --exit-node=<mullvad-node> --exit-node-allow-lan-access
   tunnel. Recent Tailscale clients (1.48.3+) route DNS correctly through
   Mullvad exit nodes without extra config, so keep your clients updated.
 
-> [!WARNING]
->
-> ### A real bug to watch for
->
-> Some Tailscale client versions around 1.82 had a defect where an
-> **active exit node bypassed the global Pi-hole nameserver**, so your
-> ad-blocking would quietly stop whenever an exit node was on. If you
-> see that symptom, update the Tailscale client first. It’s a known
-> issue, not your misconfiguration.
-
 ## Flavor 2: your own Pi as an exit node (free, but not private)
 
 You can advertise one of your *own* machines as an exit node. The helper
@@ -298,9 +288,11 @@ shape. The shape of it:
     the laptop, just moved to a box you can leave running, and it’s the
     work the add-on saves you.
 
-Reach for this if you already pay for Mullvad, want to keep your own
-config, and enjoy the plumbing. For most people the add-on (Flavor 1)
-buys the same outcome with none of the routing surgery.
+I don’t know if this would actually work, since I basically spent hours
+trying to make something very similar work on my RPi. I know that it’s
+technically different since that RPi is my DNS server on my router and
+for tailscale and I guess that makes it all more complicated, but I’m
+skeptical this would work.
 
 ## A router-level VPN might be another answer, but I can’t test it yet
 
@@ -310,15 +302,15 @@ VPN. In theory, that could move the privacy tunnel out of the
 phone/laptop app layer and into the network layer, which may avoid some
 of the conflicts in this chapter.
 
-I can’t validate that setup on my current hardware. My router’s firmware
-is too old and does not expose the VPN-client features needed to try it.
-He also doesn’t use Mullvad, so I don’t know yet whether this works
-cleanly with Mullvad’s WireGuard configs or whether it introduces a
-different set of routing or DNS problems.
+I can’t validate that setup on my current hardware. My router and its
+firmware are too old and do not expose the VPN-client features needed to
+try it. He also doesn’t use Mullvad, so I don’t know yet whether this
+works cleanly with Mullvad’s WireGuard configs or whether it introduces
+a different set of routing or DNS problems.
 
-So treat this as a lead, not a recommendation: if your router supports
-acting as a WireGuard/OpenVPN client, it may be worth investigating. It
-is not part of the tested setup in this guide.
+So treat all of these things as a lead, not a recommendation: if your
+router supports acting as a WireGuard/OpenVPN client, it may be worth
+investigating. It is not part of the tested setup in this guide.
 
 ## The decision matrix
 
